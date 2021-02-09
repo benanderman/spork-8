@@ -13,7 +13,7 @@ This is an 8-bit computer project, based heavily on [Ben Eater's 8-bit breadboar
  * **Input**: Stores 8 bits of input from peripherals. An 8-bit register that can write to the bus, but takes input from headers that can be connected to peripherals. Has built-in pull-down resistors. Only reads value on a clock cycle when input signal is high.
  
 ## Layout and signals
-These images show the layout of the modules in the 16 slots, and the functions of each of the signals.
+These images show the layout of the modules in the 16 slots, and the functions of each of the signals. There are 5 empty slots with functional IO signals; these will probably be filled with registers and/or input modules.
 ![Module layout](Images/module-layout.png)
 ![Module layout](Images/signal-functions.png)
 
