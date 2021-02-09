@@ -12,3 +12,31 @@ This is an 8-bit computer project, based heavily on [Ben Eater's 8-bit breadboar
  * **RAM**: RAM or EEPROM (they have the same pinout). Used for the program memory EEPROM (not intended to be written to), and the static memory used for storing data. Up to 15-bits of address are taken from an adjacent counter module.
  * **Input**: Stores 8 bits of input from peripherals. An 8-bit register that can write to the bus, but takes input from headers that can be connected to peripherals. Has built-in pull-down resistors. Only reads value on a clock cycle when input signal is high.
  
+## Design images
+### Schematics
+![Control Module schematic](Images/control-module-sch.png)
+![Control Module bus interface schematic](Images/control-module-bus-interface-sch.png)
+![Bus schematic](Images/bus-sch.png)
+![Register schematic](Images/register-sch.png)
+![ALU schematic](Images/alu-sch.png)
+![RAM schematic](Images/ram-sch.png)
+![Input schematic](Images/input-sch.png)
+![Clock schematic](Images/clock-sch.png)
+
+### PCB Layouts
+![Control Module PCB layout](Images/control-module-pcb.png)
+![Bus PCB layout](Images/bus-pcb.png)
+![Register PCB layout](Images/register-pcb.png)
+![ALU PCB layout](Images/alu-pcb.png)
+![RAM PCB layout](Images/ram-pcb.png)
+![Input PCB layout](Images/input-pcb.png)
+![Clock PCB layout](Images/clock-pcb.png)
+
+### 3D Renderings
+![Control Module 3D render](Images/control-module-3d.png)
+![Bus 3D render](Images/bus-3d.png)
+![Register 3D render](Images/register-3d.png)
+![ALU 3D render](Images/alu-3d.png)
+![RAM 3D render](Images/ram-3d.png)
+![Input 3D render](Images/input-3d.png)
+![Clock 3D render](Images/clock-3d.png)

@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name Bus-rescue)(type Legacy)(uri ${KIPRJMOD}/Bus-rescue.lib)(options "")(descr ""))
+)
