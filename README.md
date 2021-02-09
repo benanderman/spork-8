@@ -14,8 +14,8 @@ This is an 8-bit computer project, based heavily on [Ben Eater's 8-bit breadboar
  
 ## Layout and signals
 These images show the layout of the modules in the 16 slots, and the functions of each of the signals.
-![Module layout](images/module-layout.png)
-![Module layout](images/signal-functions.png)
+![Module layout](Images/module-layout.png)
+![Module layout](Images/signal-functions.png)
 
 ## Design images
 ### Schematics
