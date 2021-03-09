@@ -12,10 +12,12 @@ This is an 8-bit computer project, based heavily on [Ben Eater's 8-bit breadboar
  * **RAM**: RAM or EEPROM (they have the same pinout). Used for the program memory EEPROM (not intended to be written to), and the static memory used for storing data. Up to 15-bits of address are taken from an adjacent counter module.
  * **Input**: Stores 8 bits of input from peripherals. An 8-bit register that can write to the bus, but takes input from headers that can be connected to peripherals. Has built-in pull-down resistors. Only reads value on a clock cycle when input signal is high.
  
-## Layout and signals
-These images show the layout of the modules in the 16 slots, and the functions of each of the signals. There are 5 empty slots with functional IO signals; these will probably be filled with registers and/or input modules.
+## Layout, signals, and parts list
+These images show the layout of the modules in the 16 slots, the functions of each of the signals, and a parts list.
 ![Module layout](Images/module-layout.png)
-![Module layout](Images/signal-functions.png)
+![Signal functions](Images/signal-functions.png)
+![Parts list](Images/parts-list.png)
+
 
 ## Design images
 ### Schematics

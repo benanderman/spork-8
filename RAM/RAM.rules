@@ -5,13 +5,13 @@
   )
   (autoroute_settings
     (fanout off)
-    (eu.mihosoft.freerouting.autoroute on)
+    (autoroute on)
     (postroute on)
     (vias on)
     (via_costs 50)
     (plane_via_costs 5)
     (start_ripup_costs 100)
-    (start_pass_no 1700)
+    (start_pass_no 3598)
     (layer_rule F.Cu
       (active on)
       (preferred_direction horizontal)
@@ -69,7 +69,7 @@
     BUS1 BUS0 SIG1 SIG0 "SIG_IN" "SIG_OUT" CLOCK RESET
     A0 A1 A2 A3 A4 A5 A6 A7
     A8 A9 A10 A11 A12 A13 A14 A15
-    "~SIG_IN" ~ENABLE
+    "~SIG_IN" ~ENABLE "Net-(R1-Pad2)" "Net-(U2-Pad13)" "Net-(U2-Pad10)"
     (clearance_class "kicad_default")
     (via_rule kicad_default)
     (rule

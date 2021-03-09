@@ -5,13 +5,13 @@
   )
   (autoroute_settings
     (fanout off)
-    (eu.mihosoft.freerouting.autoroute on)
+    (autoroute on)
     (postroute on)
     (vias on)
     (via_costs 50)
     (plane_via_costs 5)
     (start_ripup_costs 100)
-    (start_pass_no 2159)
+    (start_pass_no 2503)
     (layer_rule F.Cu
       (active on)
       (preferred_direction horizontal)
@@ -69,9 +69,9 @@
     "Net-(J1-Pad11)" "Net-(J1-Pad10)" "Net-(J1-Pad9)" "Net-(J1-Pad8)" "Net-(J1-Pad7)" "Net-(J1-Pad6)" "Net-(J1-Pad5)" RESET
     VCC "Net-(J2-Pad12)" "Net-(J2-Pad11)" "Net-(J2-Pad10)" "Net-(J2-Pad9)" "Net-(J2-Pad8)" "Net-(J2-Pad7)" "Net-(J2-Pad6)"
     "Net-(J2-Pad5)" "Net-(J2-Pad4)" "Net-(J2-Pad3)" "Net-(J2-Pad2)" "Net-(J2-Pad1)" "Net-(R1-Pad2)" "Net-(R2-Pad2)" "Net-(R3-Pad2)"
-    "Net-(R4-Pad1)" "Net-(R5-Pad1)" "Net-(R6-Pad1)" "Net-(RN1-Pad2)" "Net-(RV1-Pad3)" "Net-(U1-Pad16)" "Net-(U1-Pad8)" "Net-(U1-Pad14)"
-    "Net-(U1-Pad12)" "Net-(U1-Pad4)" "Net-(U1-Pad3)" "Net-(U1-Pad10)" "Net-(U1-Pad9)" "Net-(U2-Pad16)" "Net-(U2-Pad14)" "Net-(U2-Pad4)"
-    "Net-(U2-Pad3)" "Net-(U4-Pad6)" "Net-(U4-Pad3)" "Net-(U4-Pad8)" "Net-(U6-Pad3)" "Net-(X1-Pad1)"
+    "Net-(R4-Pad1)" "Net-(R5-Pad1)" "Net-(R6-Pad1)" "Net-(RV1-Pad3)" "Net-(U1-Pad10)" "Net-(U4-Pad6)" "Net-(U4-Pad3)" "Net-(U4-Pad8)"
+    "Net-(U6-Pad3)" "Net-(X1-Pad1)" "GND_1k" "Net-(U1-Pad13)" "Net-(U1-Pad4)" "Net-(U1-Pad1)" "Net-(U4-Pad11)" "Net-(U6-Pad11)"
+    "Net-(U6-Pad8)" "Net-(U2-Pad11)"
     (clearance_class "kicad_default")
     (via_rule kicad_default)
     (rule

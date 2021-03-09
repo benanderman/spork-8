@@ -870,9 +870,7 @@ SIG2
 Text Notes 5450 950  2    50   ~ 0
 Module headers
 NoConn ~ 10450 2250
-NoConn ~ 9850 2250
 NoConn ~ 10450 4150
-NoConn ~ 9850 4150
 Wire Wire Line
 	1600 6150 1600 6300
 Text GLabel 1600 6150 1    50   Input ~ 0
@@ -1369,4 +1367,12 @@ Wire Wire Line
 Connection ~ 6450 5250
 Wire Wire Line
 	6450 5250 5500 5250
+Text GLabel 9750 2250 0    50   Input ~ 0
+GND
+Wire Wire Line
+	9750 2250 9850 2250
+Text GLabel 9750 4150 0    50   Input ~ 0
+GND
+Wire Wire Line
+	9750 4150 9850 4150
 $EndSCHEMATC

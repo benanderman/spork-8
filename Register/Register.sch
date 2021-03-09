@@ -444,10 +444,8 @@ Wire Wire Line
 	8800 1850 8650 1850
 Wire Wire Line
 	8800 1750 8650 1750
-Text GLabel 4600 4100 0    50   Input ~ 0
+Text GLabel 4500 4300 3    50   Input ~ 0
 GND
-Wire Wire Line
-	4600 4100 4700 4100
 $Comp
 L Connector_Generic:Conn_01x08 J4
 U 1 1 5F5AAC95
@@ -713,10 +711,6 @@ Wire Wire Line
 	9950 5200 9950 4950
 Wire Wire Line
 	9300 5200 9950 5200
-NoConn ~ 4400 3500
-NoConn ~ 4400 3600
-NoConn ~ 4400 3700
-NoConn ~ 4400 3800
 NoConn ~ 5000 3500
 NoConn ~ 5000 3600
 NoConn ~ 5000 3700
@@ -890,4 +884,45 @@ Text GLabel 3050 3850 0    50   Input ~ 0
 VCC
 Wire Wire Line
 	3050 3850 3200 3850
+Wire Wire Line
+	4400 3500 4300 3500
+Wire Wire Line
+	4300 3500 4300 3600
+Wire Wire Line
+	4400 3600 4300 3600
+Connection ~ 4300 3600
+Wire Wire Line
+	4300 3600 4300 3700
+Wire Wire Line
+	4400 3700 4300 3700
+Connection ~ 4300 3700
+Wire Wire Line
+	4300 3700 4300 3800
+Wire Wire Line
+	4400 3800 4300 3800
+$Comp
+L Device:R_Small_US R1
+U 1 1 60473EB3
+P 4300 4000
+F 0 "R1" H 4232 3954 50  0000 R CNN
+F 1 "10k" H 4232 4045 50  0000 R CNN
+F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal" H 4300 4000 50  0001 C CNN
+F 3 "~" H 4300 4000 50  0001 C CNN
+	1    4300 4000
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	4300 3800 4300 3900
+Connection ~ 4300 3800
+Wire Wire Line
+	4300 4100 4300 4200
+Wire Wire Line
+	4300 4200 4500 4200
+Wire Wire Line
+	4700 4200 4700 4100
+Wire Wire Line
+	4500 4300 4500 4200
+Connection ~ 4500 4200
+Wire Wire Line
+	4500 4200 4700 4200
 $EndSCHEMATC
