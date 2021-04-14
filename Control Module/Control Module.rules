@@ -11,7 +11,7 @@
     (via_costs 50)
     (plane_via_costs 5)
     (start_ripup_costs 100)
-    (start_pass_no 8368)
+    (start_pass_no 3783)
     (layer_rule F.Cu
       (active on)
       (preferred_direction horizontal)
@@ -75,9 +75,9 @@
     BUS6 "Net-(D37-Pad1)" BUS7 "Net-(D38-Pad1)" "Net-(J1-Pad5)" GND "Net-(J1-Pad3)" "Net-(J1-Pad2)"
     VCC "TOP_SIG_OUT_2" "TOP_SIG_OUT_1" "TOP_SIG_OUT_0" "TOP_SIG_IN_2" "TOP_SIG_IN_1" "TOP_SIG_IN_0" CLOCK
     RESET "BOTTOM_SIG_IN_0" "BOTTOM_SIG_IN_1" "BOTTOM_SIG_IN_2" "BOTTOM_SIG_OUT_0" "BOTTOM_SIG_OUT_1" "BOTTOM_SIG_OUT_2" "Net-(RN1-Pad3)"
-    "Net-(U1-Pad15)" ~CLOCK "~MI_RESET" "Net-(U2-Pad6)" "Net-(U2-Pad5)" "IR_IN" ~RESET ~CWZ
-    "Net-(U10-Pad4)" "Net-(U10-Pad2)" "Net-(U10-Pad3)" "Net-(U10-Pad1)" "Net-(U10-Pad12)" "Net-(U10-Pad6)" "Net-(U10-Pad11)" "Net-(U10-Pad5)"
-    "~FR_IN" "Net-(U6-Pad12)" "Net-(U6-Pad11)" ~CW4 ~CW0 "GND_1k" "Net-(U7-Pad12)"
+    "Net-(U1-Pad15)" ~CLOCK "Net-(U2-Pad6)" "Net-(U2-Pad5)" "IR_IN" ~RESET ~CWZ "Net-(U10-Pad4)"
+    "Net-(U10-Pad2)" "Net-(U10-Pad3)" "Net-(U10-Pad1)" "Net-(U10-Pad12)" "Net-(U10-Pad6)" "Net-(U10-Pad11)" "Net-(U10-Pad5)" "~FR_IN"
+    "Net-(U6-Pad12)" "Net-(U6-Pad11)" ~CW4 ~CW0 "GND_1k" "Net-(U7-Pad12)" "MI_CLOCK"
     (clearance_class "kicad_default")
     (via_rule kicad_default)
     (rule

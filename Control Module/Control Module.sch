@@ -77,7 +77,7 @@ Wire Wire Line
 	4150 6400 4050 6400
 Connection ~ 4050 6400
 Wire Wire Line
-	4050 6400 4050 6700
+	4050 6400 4050 6550
 Wire Wire Line
 	4150 6200 4000 6200
 Wire Wire Line
@@ -182,7 +182,7 @@ Connection ~ 4000 2750
 Wire Wire Line
 	4050 2950 4050 6300
 Connection ~ 4050 2950
-Text GLabel 4000 6700 3    50   Input ~ 0
+Text GLabel 4000 6550 3    50   Input ~ 0
 GND
 Connection ~ 3250 1150
 Connection ~ 3300 1250
@@ -196,23 +196,15 @@ Wire Wire Line
 Text GLabel 1000 1450 1    50   Input ~ 0
 VCC
 Wire Wire Line
-	1000 1450 1000 1650
-Wire Wire Line
-	1000 1650 1100 1650
-Wire Wire Line
-	1000 1650 1000 1750
-Wire Wire Line
 	1000 1750 1100 1750
-Connection ~ 1000 1650
 Wire Wire Line
 	1000 1750 1000 1850
 Wire Wire Line
 	1000 1850 1100 1850
-Connection ~ 1000 1750
 Wire Wire Line
 	1100 1950 1000 1950
 Text GLabel 1000 1950 0    50   Input ~ 0
-~CLOCK
+MI_CLOCK
 Text GLabel 1500 2450 0    50   Input ~ 0
 GND
 Wire Wire Line
@@ -751,223 +743,223 @@ Wire Wire Line
 $Comp
 L Device:LED_Small_ALT D31
 U 1 1 63D104F7
-P 5650 6850
-F 0 "D31" V 5696 6782 50  0000 R CNN
-F 1 "LED" V 5605 6782 50  0000 R CNN
-F 2 "LED_THT:LED_D3.0mm" V 5650 6850 50  0001 C CNN
-F 3 "~" V 5650 6850 50  0001 C CNN
-	1    5650 6850
+P 8850 2450
+F 0 "D31" V 8896 2382 50  0000 R CNN
+F 1 "LED" V 8805 2382 50  0000 R CNN
+F 2 "LED_THT:LED_D3.0mm" V 8850 2450 50  0001 C CNN
+F 3 "~" V 8850 2450 50  0001 C CNN
+	1    8850 2450
 	0    -1   -1   0   
 $EndComp
 $Comp
 L Device:LED_Small_ALT D32
 U 1 1 63D104FD
-P 5800 6850
-F 0 "D32" V 5846 6782 50  0000 R CNN
-F 1 "LED" V 5755 6782 50  0000 R CNN
-F 2 "LED_THT:LED_D3.0mm" V 5800 6850 50  0001 C CNN
-F 3 "~" V 5800 6850 50  0001 C CNN
-	1    5800 6850
+P 9000 2450
+F 0 "D32" V 9046 2382 50  0000 R CNN
+F 1 "LED" V 8955 2382 50  0000 R CNN
+F 2 "LED_THT:LED_D3.0mm" V 9000 2450 50  0001 C CNN
+F 3 "~" V 9000 2450 50  0001 C CNN
+	1    9000 2450
 	0    -1   -1   0   
 $EndComp
 $Comp
 L Device:LED_Small_ALT D33
 U 1 1 63D10503
-P 5950 6850
-F 0 "D33" V 5996 6782 50  0000 R CNN
-F 1 "LED" V 5905 6782 50  0000 R CNN
-F 2 "LED_THT:LED_D3.0mm" V 5950 6850 50  0001 C CNN
-F 3 "~" V 5950 6850 50  0001 C CNN
-	1    5950 6850
+P 9150 2450
+F 0 "D33" V 9196 2382 50  0000 R CNN
+F 1 "LED" V 9105 2382 50  0000 R CNN
+F 2 "LED_THT:LED_D3.0mm" V 9150 2450 50  0001 C CNN
+F 3 "~" V 9150 2450 50  0001 C CNN
+	1    9150 2450
 	0    -1   -1   0   
 $EndComp
 $Comp
 L Device:LED_Small_ALT D34
 U 1 1 63D10509
-P 6100 6850
-F 0 "D34" V 6146 6782 50  0000 R CNN
-F 1 "LED" V 6055 6782 50  0000 R CNN
-F 2 "LED_THT:LED_D3.0mm" V 6100 6850 50  0001 C CNN
-F 3 "~" V 6100 6850 50  0001 C CNN
-	1    6100 6850
+P 9300 2450
+F 0 "D34" V 9346 2382 50  0000 R CNN
+F 1 "LED" V 9255 2382 50  0000 R CNN
+F 2 "LED_THT:LED_D3.0mm" V 9300 2450 50  0001 C CNN
+F 3 "~" V 9300 2450 50  0001 C CNN
+	1    9300 2450
 	0    -1   -1   0   
 $EndComp
 $Comp
 L Device:LED_Small_ALT D35
 U 1 1 63D1050F
-P 6250 6850
-F 0 "D35" V 6296 6782 50  0000 R CNN
-F 1 "LED" V 6205 6782 50  0000 R CNN
-F 2 "LED_THT:LED_D3.0mm" V 6250 6850 50  0001 C CNN
-F 3 "~" V 6250 6850 50  0001 C CNN
-	1    6250 6850
+P 9450 2450
+F 0 "D35" V 9496 2382 50  0000 R CNN
+F 1 "LED" V 9405 2382 50  0000 R CNN
+F 2 "LED_THT:LED_D3.0mm" V 9450 2450 50  0001 C CNN
+F 3 "~" V 9450 2450 50  0001 C CNN
+	1    9450 2450
 	0    -1   -1   0   
 $EndComp
 $Comp
 L Device:LED_Small_ALT D36
 U 1 1 63D10515
-P 6400 6850
-F 0 "D36" V 6446 6782 50  0000 R CNN
-F 1 "LED" V 6355 6782 50  0000 R CNN
-F 2 "LED_THT:LED_D3.0mm" V 6400 6850 50  0001 C CNN
-F 3 "~" V 6400 6850 50  0001 C CNN
-	1    6400 6850
+P 9600 2450
+F 0 "D36" V 9646 2382 50  0000 R CNN
+F 1 "LED" V 9555 2382 50  0000 R CNN
+F 2 "LED_THT:LED_D3.0mm" V 9600 2450 50  0001 C CNN
+F 3 "~" V 9600 2450 50  0001 C CNN
+	1    9600 2450
 	0    -1   -1   0   
 $EndComp
 $Comp
 L Device:LED_Small_ALT D37
 U 1 1 63D1051B
-P 6550 6850
-F 0 "D37" V 6596 6782 50  0000 R CNN
-F 1 "LED" V 6505 6782 50  0000 R CNN
-F 2 "LED_THT:LED_D3.0mm" V 6550 6850 50  0001 C CNN
-F 3 "~" V 6550 6850 50  0001 C CNN
-	1    6550 6850
+P 9750 2450
+F 0 "D37" V 9796 2382 50  0000 R CNN
+F 1 "LED" V 9705 2382 50  0000 R CNN
+F 2 "LED_THT:LED_D3.0mm" V 9750 2450 50  0001 C CNN
+F 3 "~" V 9750 2450 50  0001 C CNN
+	1    9750 2450
 	0    -1   -1   0   
 $EndComp
 $Comp
 L Device:LED_Small_ALT D38
 U 1 1 63D10521
-P 6700 6850
-F 0 "D38" V 6746 6782 50  0000 R CNN
-F 1 "LED" V 6655 6782 50  0000 R CNN
-F 2 "LED_THT:LED_D3.0mm" V 6700 6850 50  0001 C CNN
-F 3 "~" V 6700 6850 50  0001 C CNN
-	1    6700 6850
+P 9900 2450
+F 0 "D38" V 9946 2382 50  0000 R CNN
+F 1 "LED" V 9855 2382 50  0000 R CNN
+F 2 "LED_THT:LED_D3.0mm" V 9900 2450 50  0001 C CNN
+F 3 "~" V 9900 2450 50  0001 C CNN
+	1    9900 2450
 	0    -1   -1   0   
 $EndComp
 $Comp
 L Device:R_Network08_US RN6
 U 1 1 63D10527
-P 6100 7450
-F 0 "RN6" H 5620 7404 50  0000 R CNN
-F 1 "1k" H 5620 7495 50  0000 R CNN
-F 2 "Resistor_THT:R_Array_SIP9" V 6575 7450 50  0001 C CNN
-F 3 "http://www.vishay.com/docs/31509/csc.pdf" H 6100 7450 50  0001 C CNN
-	1    6100 7450
+P 9300 3050
+F 0 "RN6" H 8820 3004 50  0000 R CNN
+F 1 "1k" H 8820 3095 50  0000 R CNN
+F 2 "Resistor_THT:R_Array_SIP9" V 9775 3050 50  0001 C CNN
+F 3 "http://www.vishay.com/docs/31509/csc.pdf" H 9300 3050 50  0001 C CNN
+	1    9300 3050
 	-1   0    0    1   
 $EndComp
-Text GLabel 6450 7650 0    50   Input ~ 0
+Text GLabel 9650 3250 0    50   Input ~ 0
 GND
 Wire Wire Line
-	6450 7650 6500 7650
+	9650 3250 9700 3250
 Wire Wire Line
-	5650 7250 5800 7250
+	8850 2850 9000 2850
 Wire Wire Line
-	5650 6950 5650 7250
+	8850 2550 8850 2850
 Wire Wire Line
-	5800 7150 5900 7150
+	9000 2750 9100 2750
 Wire Wire Line
-	5900 7150 5900 7250
+	9100 2750 9100 2850
 Wire Wire Line
-	5800 6950 5800 7150
+	9000 2550 9000 2750
 Wire Wire Line
-	6000 7250 6000 7050
+	9200 2850 9200 2650
 Wire Wire Line
-	6000 7050 5950 7050
+	9200 2650 9150 2650
 Wire Wire Line
-	5950 6950 5950 7050
+	9150 2550 9150 2650
 Wire Wire Line
-	6100 6950 6100 7250
+	9300 2550 9300 2850
 Wire Wire Line
-	6700 7250 6500 7250
+	9900 2850 9700 2850
 Wire Wire Line
-	6700 6950 6700 7250
+	9900 2550 9900 2850
 Wire Wire Line
-	6550 7150 6400 7150
+	9750 2750 9600 2750
 Wire Wire Line
-	6400 7150 6400 7250
+	9600 2750 9600 2850
 Wire Wire Line
-	6550 6950 6550 7150
+	9750 2550 9750 2750
 Wire Wire Line
-	6400 7050 6300 7050
+	9600 2650 9500 2650
 Wire Wire Line
-	6300 7050 6300 7250
+	9500 2650 9500 2850
 Wire Wire Line
-	6400 6950 6400 7050
+	9600 2550 9600 2650
 Wire Wire Line
-	6250 6950 6200 6950
+	9450 2550 9400 2550
 Wire Wire Line
-	6200 6950 6200 7250
-Text GLabel 5650 6650 1    50   Input ~ 0
+	9400 2550 9400 2850
+Text GLabel 8850 2250 1    50   Input ~ 0
 BUS0
 Wire Wire Line
-	6700 6750 6700 6650
-Text GLabel 5800 6650 1    50   Input ~ 0
+	9900 2350 9900 2250
+Text GLabel 9000 2250 1    50   Input ~ 0
 BUS1
 Wire Wire Line
-	6550 6750 6550 6650
-Text GLabel 5950 6650 1    50   Input ~ 0
+	9750 2350 9750 2250
+Text GLabel 9150 2250 1    50   Input ~ 0
 BUS2
 Wire Wire Line
-	6400 6750 6400 6650
-Text GLabel 6100 6650 1    50   Input ~ 0
+	9600 2350 9600 2250
+Text GLabel 9300 2250 1    50   Input ~ 0
 BUS3
 Wire Wire Line
-	6250 6750 6250 6650
-Text GLabel 6250 6650 1    50   Input ~ 0
+	9450 2350 9450 2250
+Text GLabel 9450 2250 1    50   Input ~ 0
 BUS4
 Wire Wire Line
-	6100 6750 6100 6650
-Text GLabel 6400 6650 1    50   Input ~ 0
+	9300 2350 9300 2250
+Text GLabel 9600 2250 1    50   Input ~ 0
 BUS5
 Wire Wire Line
-	5950 6750 5950 6650
-Text GLabel 6550 6650 1    50   Input ~ 0
+	9150 2350 9150 2250
+Text GLabel 9750 2250 1    50   Input ~ 0
 BUS6
 Wire Wire Line
-	5800 6750 5800 6650
-Text GLabel 6700 6650 1    50   Input ~ 0
+	9000 2350 9000 2250
+Text GLabel 9900 2250 1    50   Input ~ 0
 BUS7
 Wire Wire Line
-	5650 6750 5650 6650
+	8850 2350 8850 2250
 $Comp
 L Device:R_Network08_US RN2
 U 1 1 63EFE375
-P 4950 7450
-F 0 "RN2" H 4470 7404 50  0000 R CNN
-F 1 "100k" H 4470 7495 50  0000 R CNN
-F 2 "Resistor_THT:R_Array_SIP9" V 5425 7450 50  0001 C CNN
-F 3 "http://www.vishay.com/docs/31509/csc.pdf" H 4950 7450 50  0001 C CNN
-	1    4950 7450
+P 3950 7450
+F 0 "RN2" H 3470 7404 50  0000 R CNN
+F 1 "1k" H 3470 7495 50  0000 R CNN
+F 2 "Resistor_THT:R_Array_SIP9" V 4425 7450 50  0001 C CNN
+F 3 "http://www.vishay.com/docs/31509/csc.pdf" H 3950 7450 50  0001 C CNN
+	1    3950 7450
 	-1   0    0    1   
 $EndComp
-Text GLabel 5300 7650 0    50   Input ~ 0
+Text GLabel 4300 7650 0    50   Input ~ 0
 GND
 Wire Wire Line
-	5300 7650 5350 7650
-Text GLabel 4650 7150 1    50   Input ~ 0
+	4300 7650 4350 7650
+Text GLabel 3650 7150 1    50   Input ~ 0
 BUS0
-Text GLabel 4750 7150 1    50   Input ~ 0
+Text GLabel 3750 7150 1    50   Input ~ 0
 BUS1
-Text GLabel 4850 7150 1    50   Input ~ 0
+Text GLabel 3850 7150 1    50   Input ~ 0
 BUS2
-Text GLabel 4950 7150 1    50   Input ~ 0
+Text GLabel 3950 7150 1    50   Input ~ 0
 BUS3
-Text GLabel 5050 7150 1    50   Input ~ 0
+Text GLabel 4050 7150 1    50   Input ~ 0
 BUS4
-Text GLabel 5150 7150 1    50   Input ~ 0
+Text GLabel 4150 7150 1    50   Input ~ 0
 BUS5
-Text GLabel 5250 7150 1    50   Input ~ 0
+Text GLabel 4250 7150 1    50   Input ~ 0
 BUS6
-Text GLabel 5350 7150 1    50   Input ~ 0
+Text GLabel 4350 7150 1    50   Input ~ 0
 BUS7
 Wire Wire Line
-	4650 7150 4650 7250
+	3650 7150 3650 7250
 Wire Wire Line
-	4750 7150 4750 7250
+	3750 7150 3750 7250
 Wire Wire Line
-	4850 7150 4850 7250
+	3850 7150 3850 7250
 Wire Wire Line
-	4950 7150 4950 7250
+	3950 7150 3950 7250
 Wire Wire Line
-	5050 7150 5050 7250
+	4050 7150 4050 7250
 Wire Wire Line
-	5150 7150 5150 7250
+	4150 7150 4150 7250
 Wire Wire Line
-	5250 7150 5250 7250
+	4250 7150 4250 7250
 Wire Wire Line
-	5350 7150 5350 7250
+	4350 7150 4350 7250
 $Comp
 L Device:LED_Small_ALT D23
 U 1 1 64223645
@@ -1315,9 +1307,9 @@ CW14
 Text GLabel 7800 5200 1    50   Input ~ 0
 CW15
 Wire Wire Line
-	3950 6000 3950 6700
+	3950 6000 3950 6550
 Wire Wire Line
-	3950 6700 4050 6700
+	3950 6550 4050 6550
 Connection ~ 3950 6000
 Wire Wire Line
 	9900 3700 10050 3700
@@ -1451,7 +1443,7 @@ F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 7600 3600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Text GLabel 1000 3850 0    50   Input ~ 0
-CLOCK
+~CLOCK
 Wire Wire Line
 	1000 3850 1100 3850
 Wire Wire Line
@@ -1685,20 +1677,20 @@ F 3 "http://www.ti.com/lit/gpn/sn74LS08" H 7550 1100 50  0001 C CNN
 	1    7550 1100
 	1    0    0    -1  
 $EndComp
-Text GLabel 7150 1000 0    50   Input ~ 0
+Text GLabel 900  1650 0    50   Input ~ 0
 ~CWZ
-Text GLabel 7150 1200 0    50   Input ~ 0
-~RESET
+Text GLabel 7150 1100 0    50   Input ~ 0
+~CLOCK
 Wire Wire Line
 	7150 1000 7250 1000
 Wire Wire Line
 	7150 1200 7250 1200
 Text GLabel 7950 1100 2    50   Input ~ 0
-~MI_RESET
+MI_CLOCK
 Wire Wire Line
 	7950 1100 7850 1100
 Text GLabel 1000 2150 0    50   Input ~ 0
-~MI_RESET
+~RESET
 $Comp
 L 74xx:74LS08 U6
 U 2 1 65BAC215
@@ -1713,7 +1705,7 @@ $EndComp
 Text GLabel 7150 1550 0    50   Input ~ 0
 CW15
 Text GLabel 7150 1350 0    50   Input ~ 0
-CLOCK
+~CLOCK
 Wire Wire Line
 	7150 1350 7250 1350
 Wire Wire Line
@@ -1800,119 +1792,119 @@ NoConn ~ 9200 1550
 $Comp
 L Device:C_Small C4
 U 1 1 661F4402
-P 9500 2450
-F 0 "C4" H 9592 2496 50  0000 L CNN
-F 1 "100nF" H 9592 2405 50  0000 L CNN
-F 2 "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm" H 9500 2450 50  0001 C CNN
-F 3 "~" H 9500 2450 50  0001 C CNN
-	1    9500 2450
+P 7800 2100
+F 0 "C4" H 7892 2146 50  0000 L CNN
+F 1 "100nF" H 7892 2055 50  0000 L CNN
+F 2 "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm" H 7800 2100 50  0001 C CNN
+F 3 "~" H 7800 2100 50  0001 C CNN
+	1    7800 2100
 	1    0    0    -1  
 $EndComp
-Text GLabel 9500 2250 1    50   Input ~ 0
+Text GLabel 7800 1900 1    50   Input ~ 0
 VCC
 Text GLabel 6200 4450 0    50   Input ~ 0
 GND
-Text GLabel 9500 2650 3    50   Input ~ 0
+Text GLabel 7800 2300 3    50   Input ~ 0
 GND
 Wire Wire Line
-	9500 2650 9500 2550
+	7800 2300 7800 2200
 Wire Wire Line
-	9500 2350 9500 2250
+	7800 2000 7800 1900
 $Comp
 L Device:C_Small C1
 U 1 1 66237F8D
-P 8600 2450
-F 0 "C1" H 8692 2496 50  0000 L CNN
-F 1 "100nF" H 8692 2405 50  0000 L CNN
-F 2 "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm" H 8600 2450 50  0001 C CNN
-F 3 "~" H 8600 2450 50  0001 C CNN
-	1    8600 2450
+P 6900 2100
+F 0 "C1" H 6992 2146 50  0000 L CNN
+F 1 "100nF" H 6992 2055 50  0000 L CNN
+F 2 "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm" H 6900 2100 50  0001 C CNN
+F 3 "~" H 6900 2100 50  0001 C CNN
+	1    6900 2100
 	1    0    0    -1  
 $EndComp
-Text GLabel 8600 2250 1    50   Input ~ 0
+Text GLabel 6900 1900 1    50   Input ~ 0
 VCC
-Text GLabel 8600 2650 3    50   Input ~ 0
+Text GLabel 6900 2300 3    50   Input ~ 0
 GND
 Wire Wire Line
-	8600 2650 8600 2550
+	6900 2300 6900 2200
 Wire Wire Line
-	8600 2350 8600 2250
+	6900 2000 6900 1900
 $Comp
 L Device:C_Small C2
 U 1 1 66257548
-P 8900 2450
-F 0 "C2" H 8992 2496 50  0000 L CNN
-F 1 "100nF" H 8992 2405 50  0000 L CNN
-F 2 "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm" H 8900 2450 50  0001 C CNN
-F 3 "~" H 8900 2450 50  0001 C CNN
-	1    8900 2450
+P 7200 2100
+F 0 "C2" H 7292 2146 50  0000 L CNN
+F 1 "100nF" H 7292 2055 50  0000 L CNN
+F 2 "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm" H 7200 2100 50  0001 C CNN
+F 3 "~" H 7200 2100 50  0001 C CNN
+	1    7200 2100
 	1    0    0    -1  
 $EndComp
-Text GLabel 8900 2250 1    50   Input ~ 0
+Text GLabel 7200 1900 1    50   Input ~ 0
 VCC
-Text GLabel 8900 2650 3    50   Input ~ 0
+Text GLabel 7200 2300 3    50   Input ~ 0
 GND
 Wire Wire Line
-	8900 2650 8900 2550
+	7200 2300 7200 2200
 Wire Wire Line
-	8900 2350 8900 2250
+	7200 2000 7200 1900
 $Comp
 L Device:C_Small C3
 U 1 1 662770E5
-P 9200 2450
-F 0 "C3" H 9292 2496 50  0000 L CNN
-F 1 "100nF" H 9292 2405 50  0000 L CNN
-F 2 "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm" H 9200 2450 50  0001 C CNN
-F 3 "~" H 9200 2450 50  0001 C CNN
-	1    9200 2450
+P 7500 2100
+F 0 "C3" H 7592 2146 50  0000 L CNN
+F 1 "100nF" H 7592 2055 50  0000 L CNN
+F 2 "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm" H 7500 2100 50  0001 C CNN
+F 3 "~" H 7500 2100 50  0001 C CNN
+	1    7500 2100
 	1    0    0    -1  
 $EndComp
-Text GLabel 9200 2250 1    50   Input ~ 0
+Text GLabel 7500 1900 1    50   Input ~ 0
 VCC
-Text GLabel 9200 2650 3    50   Input ~ 0
+Text GLabel 7500 2300 3    50   Input ~ 0
 GND
 Wire Wire Line
-	9200 2650 9200 2550
+	7500 2300 7500 2200
 Wire Wire Line
-	9200 2350 9200 2250
+	7500 2000 7500 1900
 $Comp
 L Device:C_Small C5
 U 1 1 662B82FC
-P 9800 2450
-F 0 "C5" H 9892 2496 50  0000 L CNN
-F 1 "100nF" H 9892 2405 50  0000 L CNN
-F 2 "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm" H 9800 2450 50  0001 C CNN
-F 3 "~" H 9800 2450 50  0001 C CNN
-	1    9800 2450
+P 8100 2100
+F 0 "C5" H 8192 2146 50  0000 L CNN
+F 1 "100nF" H 8192 2055 50  0000 L CNN
+F 2 "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm" H 8100 2100 50  0001 C CNN
+F 3 "~" H 8100 2100 50  0001 C CNN
+	1    8100 2100
 	1    0    0    -1  
 $EndComp
-Text GLabel 9800 2250 1    50   Input ~ 0
+Text GLabel 8100 1900 1    50   Input ~ 0
 VCC
-Text GLabel 9800 2650 3    50   Input ~ 0
+Text GLabel 8100 2300 3    50   Input ~ 0
 GND
 Wire Wire Line
-	9800 2650 9800 2550
+	8100 2300 8100 2200
 Wire Wire Line
-	9800 2350 9800 2250
+	8100 2000 8100 1900
 $Comp
 L Device:C_Small C6
 U 1 1 662D8E14
-P 10050 2450
-F 0 "C6" H 10142 2496 50  0000 L CNN
-F 1 "100nF" H 10142 2405 50  0000 L CNN
-F 2 "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm" H 10050 2450 50  0001 C CNN
-F 3 "~" H 10050 2450 50  0001 C CNN
-	1    10050 2450
+P 8350 2100
+F 0 "C6" H 8442 2146 50  0000 L CNN
+F 1 "100nF" H 8442 2055 50  0000 L CNN
+F 2 "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm" H 8350 2100 50  0001 C CNN
+F 3 "~" H 8350 2100 50  0001 C CNN
+	1    8350 2100
 	1    0    0    -1  
 $EndComp
-Text GLabel 10050 2250 1    50   Input ~ 0
+Text GLabel 8350 1900 1    50   Input ~ 0
 VCC
-Text GLabel 10050 2650 3    50   Input ~ 0
+Text GLabel 8350 2300 3    50   Input ~ 0
 GND
 Wire Wire Line
-	10050 2650 10050 2550
+	8350 2300 8350 2200
 Wire Wire Line
-	10050 2350 10050 2250
+	8350 2000 8350 1900
 Text GLabel 8650 1000 1    50   Input ~ 0
 VCC
 Text GLabel 8650 1400 3    50   Input ~ 0
@@ -2015,7 +2007,7 @@ L Device:R_Small_US R1
 U 1 1 5F86D51F
 P 4850 3750
 F 0 "R1" H 4918 3796 50  0000 L CNN
-F 1 "100k" H 4918 3705 50  0000 L CNN
+F 1 "1k" H 4918 3705 50  0000 L CNN
 F 2 "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal" H 4850 3750 50  0001 C CNN
 F 3 "~" H 4850 3750 50  0001 C CNN
 	1    4850 3750
@@ -2067,4 +2059,107 @@ Text GLabel 7200 4650 0    50   Input ~ 0
 GND_1k
 Wire Wire Line
 	7200 4650 7300 4650
+Wire Wire Line
+	900  1650 1100 1650
+Wire Wire Line
+	1000 1750 1000 1450
+Connection ~ 1000 1750
+Wire Wire Line
+	7150 1000 7150 1200
+Text Notes 6600 700  0    50   ~ 0
+MI_CLOCK is buffered to add a tiny delay, to ensure\nIR_IN goes high before the EEPROM signals invalidate.
+$Comp
+L Device:R_Network08_US RN7
+U 1 1 60824852
+P 5000 7450
+F 0 "RN7" H 4520 7404 50  0000 R CNN
+F 1 "1k" H 4520 7495 50  0000 R CNN
+F 2 "Resistor_THT:R_Array_SIP9" V 5475 7450 50  0001 C CNN
+F 3 "http://www.vishay.com/docs/31509/csc.pdf" H 5000 7450 50  0001 C CNN
+	1    5000 7450
+	-1   0    0    1   
+$EndComp
+Text GLabel 5350 7650 0    50   Input ~ 0
+GND
+Wire Wire Line
+	5350 7650 5400 7650
+Wire Wire Line
+	4700 7150 4700 7250
+Wire Wire Line
+	4800 7150 4800 7250
+Wire Wire Line
+	4900 7150 4900 7250
+Wire Wire Line
+	5000 7150 5000 7250
+Wire Wire Line
+	5100 7150 5100 7250
+Wire Wire Line
+	5200 7150 5200 7250
+Wire Wire Line
+	5300 7150 5300 7250
+Wire Wire Line
+	5400 7150 5400 7250
+$Comp
+L Device:R_Network08_US RN8
+U 1 1 6084D4FC
+P 6050 7450
+F 0 "RN8" H 5570 7404 50  0000 R CNN
+F 1 "1k" H 5570 7495 50  0000 R CNN
+F 2 "Resistor_THT:R_Array_SIP9" V 6525 7450 50  0001 C CNN
+F 3 "http://www.vishay.com/docs/31509/csc.pdf" H 6050 7450 50  0001 C CNN
+	1    6050 7450
+	-1   0    0    1   
+$EndComp
+Text GLabel 6400 7650 0    50   Input ~ 0
+GND
+Wire Wire Line
+	6400 7650 6450 7650
+Wire Wire Line
+	5750 7150 5750 7250
+Wire Wire Line
+	5850 7150 5850 7250
+Wire Wire Line
+	5950 7150 5950 7250
+Wire Wire Line
+	6050 7150 6050 7250
+Wire Wire Line
+	6150 7150 6150 7250
+Wire Wire Line
+	6250 7150 6250 7250
+Wire Wire Line
+	6350 7150 6350 7250
+Wire Wire Line
+	6450 7150 6450 7250
+Text GLabel 4700 7150 1    50   Input ~ 0
+CW0
+Text GLabel 4800 7150 1    50   Input ~ 0
+CW1
+Text GLabel 4900 7150 1    50   Input ~ 0
+CW2
+Text GLabel 5000 7150 1    50   Input ~ 0
+CW3
+Text GLabel 5100 7150 1    50   Input ~ 0
+CW4
+Text GLabel 5200 7150 1    50   Input ~ 0
+CW5
+Text GLabel 5300 7150 1    50   Input ~ 0
+CW6
+Text GLabel 5400 7150 1    50   Input ~ 0
+CW7
+Text GLabel 5750 7150 1    50   Input ~ 0
+CW8
+Text GLabel 5850 7150 1    50   Input ~ 0
+CW9
+Text GLabel 5950 7150 1    50   Input ~ 0
+CW10
+Text GLabel 6050 7150 1    50   Input ~ 0
+CW11
+Text GLabel 6150 7150 1    50   Input ~ 0
+CW12
+Text GLabel 6250 7150 1    50   Input ~ 0
+CW13
+Text GLabel 6350 7150 1    50   Input ~ 0
+CW14
+Text GLabel 6450 7150 1    50   Input ~ 0
+CW15
 $EndSCHEMATC

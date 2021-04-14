@@ -196,23 +196,15 @@ Wire Wire Line
 Text GLabel 1000 1450 1    50   Input ~ 0
 VCC
 Wire Wire Line
-	1000 1450 1000 1650
-Wire Wire Line
-	1000 1650 1100 1650
-Wire Wire Line
-	1000 1650 1000 1750
-Wire Wire Line
 	1000 1750 1100 1750
-Connection ~ 1000 1650
 Wire Wire Line
 	1000 1750 1000 1850
 Wire Wire Line
 	1000 1850 1100 1850
-Connection ~ 1000 1750
 Wire Wire Line
 	1100 1950 1000 1950
 Text GLabel 1000 1950 0    50   Input ~ 0
-~CLOCK
+MI_CLOCK
 Text GLabel 1500 2450 0    50   Input ~ 0
 GND
 Wire Wire Line
@@ -1451,7 +1443,7 @@ F 3 "http://www.ti.com/lit/gpn/sn74LS04" H 7600 3600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Text GLabel 1000 3850 0    50   Input ~ 0
-CLOCK
+~CLOCK
 Wire Wire Line
 	1000 3850 1100 3850
 Wire Wire Line
@@ -1685,20 +1677,20 @@ F 3 "http://www.ti.com/lit/gpn/sn74LS08" H 7550 1100 50  0001 C CNN
 	1    7550 1100
 	1    0    0    -1  
 $EndComp
-Text GLabel 7150 1000 0    50   Input ~ 0
+Text GLabel 900  1650 0    50   Input ~ 0
 ~CWZ
-Text GLabel 7150 1200 0    50   Input ~ 0
-~RESET
+Text GLabel 7150 1100 0    50   Input ~ 0
+~CLOCK
 Wire Wire Line
 	7150 1000 7250 1000
 Wire Wire Line
 	7150 1200 7250 1200
 Text GLabel 7950 1100 2    50   Input ~ 0
-~MI_RESET
+MI_CLOCK
 Wire Wire Line
 	7950 1100 7850 1100
 Text GLabel 1000 2150 0    50   Input ~ 0
-~MI_RESET
+~RESET
 $Comp
 L 74xx:74LS08 U6
 U 2 1 65BAC215
@@ -1713,7 +1705,7 @@ $EndComp
 Text GLabel 7150 1550 0    50   Input ~ 0
 CW15
 Text GLabel 7150 1350 0    50   Input ~ 0
-CLOCK
+~CLOCK
 Wire Wire Line
 	7150 1350 7250 1350
 Wire Wire Line
@@ -1913,23 +1905,23 @@ Wire Wire Line
 	10050 2650 10050 2550
 Wire Wire Line
 	10050 2350 10050 2250
-Text GLabel 8800 1000 1    50   Input ~ 0
+Text GLabel 8650 1000 1    50   Input ~ 0
 VCC
-Text GLabel 8800 1400 3    50   Input ~ 0
+Text GLabel 8650 1400 3    50   Input ~ 0
 GND
 Wire Wire Line
-	8800 1400 8800 1300
+	8650 1400 8650 1300
 Wire Wire Line
-	8800 1100 8800 1000
+	8650 1100 8650 1000
 $Comp
 L Device:CP_Small C8
 U 1 1 6643C54F
-P 8800 1200
-F 0 "C8" H 8888 1246 50  0000 L CNN
-F 1 "1mF" H 8888 1155 50  0000 L CNN
-F 2 "Capacitor_THT:CP_Radial_D8.0mm_P3.50mm" H 8800 1200 50  0001 C CNN
-F 3 "~" H 8800 1200 50  0001 C CNN
-	1    8800 1200
+P 8650 1200
+F 0 "C8" H 8738 1246 50  0000 L CNN
+F 1 "1000uF" H 8738 1155 50  0000 L CNN
+F 2 "Capacitor_THT:CP_Radial_D8.0mm_P3.50mm" H 8650 1200 50  0001 C CNN
+F 3 "~" H 8650 1200 50  0001 C CNN
+	1    8650 1200
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -2067,4 +2059,13 @@ Text GLabel 7200 4650 0    50   Input ~ 0
 GND_1k
 Wire Wire Line
 	7200 4650 7300 4650
+Wire Wire Line
+	900  1650 1100 1650
+Wire Wire Line
+	1000 1750 1000 1450
+Connection ~ 1000 1750
+Wire Wire Line
+	7150 1000 7150 1200
+Text Notes 6600 700  0    50   ~ 0
+MI_CLOCK is buffered to add a tiny delay, to ensure\nIR_IN goes high before the EEPROM signals invalidate.
 $EndSCHEMATC
