@@ -25,9 +25,9 @@
 #define STCK 0b0010 // Inner top right
 #define SRAM 0b0011 // Inner bottom right
 #define REGE 0b0100 // Outer top left
-#define INPB 0b0101 // Outer bottom left
+#define INPA 0b0101 // Outer bottom left
 #define MADR 0b0110 // Outer top right
-#define INPA 0b0111 // Outer bottom right
+#define INPB 0b0111 // Outer bottom right
 
 // Top
 #define CLCK 0b1000 // Inner top left
