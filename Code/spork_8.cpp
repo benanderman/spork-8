@@ -1,7 +1,12 @@
 #include "spork_8.h"
 
-// Delay in microseconds when cycling clock or reset; 1 is equivalent to a 1MHz clock.
-static const int standardDelay = 1;
+// Delay in microseconds when cycling clock, reset, or allowing for setup time.
+// 1 is equivalent to a 1MHz clock.
+static const int standardDelayTime = 3;
+
+static void standardDelay() {
+  delayMicroseconds(standardDelayTime);
+}
 
 void Spork8::setPinModes() {
   pinMode(conf.resetPin, OUTPUT);
@@ -25,6 +30,7 @@ void Spork8::writeRange(uint16_t start, uint16_t len, WriteCallback callback) {
   for (uint16_t i = 0; i < len; i++) {
     byte value = callback(start + i);
     setBus(value);
+    standardDelay(); // Setup time
     cycleClock();
   }
   setBusMode(INPUT);
@@ -36,7 +42,8 @@ void Spork8::readRange(uint16_t start, uint16_t len, ReadCallback callback) {
   setOutIndex(conf.memoryIndex);
   setCounterModes(true, false);
   setBusMode(INPUT);
-  for (int i = 0; i < len; i++) {
+  standardDelay(); // Setup time
+  for (uint16_t i = 0; i < len; i++) {
     byte value = readBus();
     callback(start + i, value);
     cycleClock();
@@ -63,13 +70,13 @@ byte Spork8::readAddress(uint16_t address) {
 
 void Spork8::cycleClock() {
   digitalWrite(conf.clockPin, HIGH);
-  delayMicroseconds(standardDelay);
+  standardDelay();
   digitalWrite(conf.clockPin, LOW);
 }
 
 void Spork8::reset() {
   digitalWrite(conf.resetPin, HIGH);
-  delayMicroseconds(standardDelay);
+  standardDelay();
   digitalWrite(conf.resetPin, LOW);
 }
 
