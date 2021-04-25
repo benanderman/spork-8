@@ -1,12 +1,15 @@
 #include "spork_8.h"
 
-// Delay in microseconds when cycling clock, reset, or allowing for setup time.
+// Delay in microseconds when cycling reset, or allowing for setup time.
 // 1 is equivalent to a 1MHz clock.
-static const int standardDelayTime = 3;
+static const int standardDelayTime = 1;
 
 static void standardDelay() {
   delayMicroseconds(standardDelayTime);
 }
+
+static const int pageWriteDelay = 11; // ms
+static const uint16_t pageMask = 0b1111111000000;
 
 void Spork8::setPinModes() {
   pinMode(conf.resetPin, OUTPUT);
@@ -25,13 +28,26 @@ void Spork8::writeRange(uint16_t start, uint16_t len, WriteCallback callback) {
   setCounterValue(start);
   setInIndex(conf.memoryIndex);
   setOutIndex(conf.selfIndex);
-  setCounterModes(true, false);
+  setCounterModes(false, false);
+  standardDelay(); // Setup time
   setBusMode(OUTPUT);
   for (uint16_t i = 0; i < len; i++) {
-    byte value = callback(start + i);
+    uint16_t addr = start + i;
+    byte value = callback(addr);
     setBus(value);
-    standardDelay(); // Setup time
-    cycleClock();
+    cycleClock(); // Write current address
+
+    if (((addr + 1) & pageMask) != (addr & pageMask)) {
+      delay(pageWriteDelay);
+    }
+
+    if (i != len - 1) { // Don't count on final address
+      setCounterModes(true, false);
+      setInIndex(conf.selfIndex);
+      cycleClock(); // Go to next address
+      setInIndex(conf.memoryIndex);
+      setCounterModes(false, false);
+    }
   }
   setBusMode(INPUT);
 }
@@ -42,11 +58,13 @@ void Spork8::readRange(uint16_t start, uint16_t len, ReadCallback callback) {
   setOutIndex(conf.memoryIndex);
   setCounterModes(true, false);
   setBusMode(INPUT);
-  standardDelay(); // Setup time
   for (uint16_t i = 0; i < len; i++) {
+    standardDelay(); // Setup time
     byte value = readBus();
     callback(start + i, value);
-    cycleClock();
+    if (i != len - 1) { // Don't count on final address
+      cycleClock();
+    }
   }
 }
 
@@ -56,6 +74,7 @@ void Spork8::writeAddress(uint16_t address, byte value) {
   setInIndex(conf.memoryIndex);
   setBusMode(OUTPUT);
   setBus(value);
+  standardDelay(); // Setup time
   cycleClock();
   setBusMode(INPUT);
 }
@@ -70,7 +89,6 @@ byte Spork8::readAddress(uint16_t address) {
 
 void Spork8::cycleClock() {
   digitalWrite(conf.clockPin, HIGH);
-  standardDelay();
   digitalWrite(conf.clockPin, LOW);
 }
 

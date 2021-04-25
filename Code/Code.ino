@@ -9,7 +9,6 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-
 }
 
 void testSpork8Mem() {
@@ -29,20 +28,23 @@ void testSpork8Mem() {
   spork8.setPinModes();
 
   Serial.println("Writing test data");
-  spork8.writeRange(0, 1 << 15, spork8TestData);
-  Serial.println("Done writing test data; reading");
-  spork8.readRange(0, 1 << 15, printSpork8TestData);
+  spork8.writeRange(0, 1 << 13, spork8TestData);
+  Serial.println("Reading");
+  spork8.readRange(0, 1 << 13, printSpork8TestData);
 }
 
 byte spork8TestData(uint16_t address) {
-  const char *test = "Hello memory!";
+  const char *test = "0 1 2 3 4 5 6 7 ";
   return test[address % strlen(test)];
 }
 
 void printSpork8TestData(uint16_t address, byte value) {
-  char c = value;
-  Serial.print(c);
-  if (address % 78 == 0) {
+  if (address != 0 && address % 64 == 0) {
     Serial.print('\n');
+  }
+  Serial.print(value, HEX);
+  if (spork8TestData(address) != value) {
+    Serial.print("\nValue was incorrect, should be:");
+    Serial.print(spork8TestData(address), HEX);
   }
 }
