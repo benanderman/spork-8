@@ -508,13 +508,9 @@ Wire Wire Line
 Wire Wire Line
 	6050 3200 6050 4100
 Wire Wire Line
-	4450 4100 4450 5100
-Wire Wire Line
 	6050 5000 6050 5900
 Wire Wire Line
 	6050 5900 4450 5900
-Wire Wire Line
-	4450 5900 4450 6900
 Text Label 6150 4500 0    50   ~ 0
 A8
 Text Label 6150 4600 0    50   ~ 0
@@ -723,26 +719,6 @@ Wire Wire Line
 Wire Wire Line
 	5050 1550 5050 1600
 Connection ~ 5050 1550
-Text GLabel 4950 3400 0    50   Input ~ 0
-SIG0
-Wire Wire Line
-	4950 3400 5050 3400
-Wire Wire Line
-	4450 3300 5050 3300
-Wire Wire Line
-	4450 2300 4450 3300
-Wire Wire Line
-	4450 5100 5050 5100
-Text GLabel 4950 5200 0    50   Input ~ 0
-SIG0
-Wire Wire Line
-	4950 5200 5050 5200
-Text GLabel 4950 7000 0    50   Input ~ 0
-SIG0
-Wire Wire Line
-	4950 7000 5050 7000
-Wire Wire Line
-	4450 6900 5050 6900
 Text GLabel 4950 1700 0    50   Input ~ 0
 CLOCK
 Wire Wire Line
@@ -1632,4 +1608,31 @@ Text GLabel 9950 1250 0    50   Input ~ 0
 GND
 NoConn ~ 10650 1250
 NoConn ~ 10650 1850
+Wire Wire Line
+	5050 7000 5050 6950
+Wire Wire Line
+	5050 6950 4450 6950
+Wire Wire Line
+	4450 5900 4450 6950
+Connection ~ 5050 6950
+Wire Wire Line
+	5050 6950 5050 6900
+Wire Wire Line
+	5050 5200 5050 5150
+Wire Wire Line
+	5050 5150 4450 5150
+Wire Wire Line
+	4450 4100 4450 5150
+Connection ~ 5050 5150
+Wire Wire Line
+	5050 5150 5050 5100
+Wire Wire Line
+	5050 3400 5050 3350
+Wire Wire Line
+	5050 3350 4450 3350
+Wire Wire Line
+	4450 2300 4450 3350
+Connection ~ 5050 3350
+Wire Wire Line
+	5050 3350 5050 3300
 $EndSCHEMATC
