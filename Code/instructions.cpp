@@ -9,24 +9,29 @@ static uint16_t BASE[] = {
 static byte BASE_LEN = sizeof(BASE) / sizeof(*BASE);
 
 static uint16_t LDAI[] = {
-  OUT(PMEM) + IN(REGA) + PCNT_COUNT
+  OUT(PMEM) + IN(REGA),
+  PCNT_COUNT
 };
 
 static uint16_t LDBI[] = {
-  OUT(PMEM) + IN(REGB) + PCNT_COUNT
+  OUT(PMEM) + IN(REGB),
+  PCNT_COUNT
 };
 
 static uint16_t LDCI[] = {
-  OUT(PMEM) + IN(REGC) + PCNT_COUNT
+  OUT(PMEM) + IN(REGC),
+  PCNT_COUNT
 };
 
 static uint16_t ADDI[] = {
-  OUT(PMEM) + IN(REGB) + PCNT_COUNT,
+  OUT(PMEM) + IN(REGB),
+  PCNT_COUNT,
   OUT(ALU) + IN(REGA)
 };
 
 static uint16_t SUBI[] = {
-  OUT(PMEM) + IN(REGB) + PCNT_COUNT,
+  OUT(PMEM) + IN(REGB),
+  PCNT_COUNT,
   OUT(ALU) + IN(REGA) + ALU_SUB
 };
 
@@ -115,4 +120,41 @@ byte getMicrocodeHighByte(uint16_t address) {
 
 byte getMicrocodeLowByte(uint16_t address) {
   return getMicrocode(address) & 0xFF;
+}
+
+byte getTestProgramByte(uint16_t address) {
+  byte program[] = {
+    0, 1, // LDAI 1
+    1, 33, // LDBI 33
+    2, 65, // LDCI 65
+    3, 2, // ADDI 2
+    3, 4, // ADDI 4
+    3, 8, // ADDI 8
+    3, 16, // ADDI 16
+    3, 32, // ADDI 32
+    3, 64, // ADDI 64
+    3, 128, // ADDI 128
+    5, 0b10000001, // ANDI
+    5, 0b01000010, // ANDI
+    5, 0b00100100, // ANDI
+    5, 0b00011000, // ANDI
+    5, 0b00000000, // ANDI
+    3, 2, // ADDI 2
+    3, 4, // ADDI 4
+    3, 8, // ADDI 8
+    3, 16, // ADDI 16
+    3, 32, // ADDI 32
+    3, 64, // ADDI 64
+    3, 128, // ADDI 128
+    4, 2, // SUBI 2
+    4, 4, // SUBI 4
+    4, 8, // SUBI 8
+    4, 16, // SUBI 16
+    4, 32, // SUBI 32
+    4, 64, // SUBI 64
+    4, 128, // SUBI 128
+    6, 0, 4, // JUMP 3
+  };
+  int len = sizeof(program) / sizeof(*program);
+  return program[address % len];
 }

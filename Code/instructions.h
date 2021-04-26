@@ -9,4 +9,6 @@ uint16_t getMicrocode(uint16_t address);
 byte getMicrocodeHighByte(uint16_t address);
 byte getMicrocodeLowByte(uint16_t address);
 
+byte getTestProgramByte(uint16_t address);
+
 #endif

@@ -4,14 +4,15 @@
 
 void setup() {
   Serial.begin(57600);
-  writeMicrocode(false);
+  writeTestProgram();
+//  writeMicrocode(false);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 }
 
-void writeMicrocode(bool highBytes) {
+Spork8 getNewSpork8() {
   Spork8Config conf = {
     .memoryIndex = 1,
     .counterIndex = 0,
@@ -27,6 +28,28 @@ void writeMicrocode(bool highBytes) {
 
   Spork8 spork8 = Spork8(conf);
   spork8.setPinModes();
+  return spork8;
+}
+
+void writeTestProgram() {
+  Spork8 spork8 = getNewSpork8();
+
+  Serial.println("Writing test program");
+  spork8.writeRange(0, 1 << 13, getTestProgramByte, true);
+  Serial.println("Reading");
+  spork8.readRange(0, 1 << 13, printAndVerifyTestProgramByte, true);
+}
+
+void printAndVerifyTestProgramByte(uint16_t address, byte value) {
+  printMemoryByte(address, value);
+  if (getTestProgramByte(address) != value) {
+    Serial.print("\nValue was incorrect, should be:");
+    Serial.println(getTestProgramByte(address), HEX);
+  }
+}
+
+void writeMicrocode(bool highBytes) {
+  Spork8 spork8 = getNewSpork8();
 
   Serial.println("Writing microcode");
   spork8.writeRange(0, 1 << 13, highBytes ? getMicrocodeHighByte : getMicrocodeLowByte);
@@ -35,7 +58,7 @@ void writeMicrocode(bool highBytes) {
 }
 
 void printAndVerifyMicrocodeHighByte(uint16_t address, byte value) {
-  printMicrocode(address, value);
+  printMemoryByte(address, value);
   if (getMicrocodeHighByte(address) != value) {
     Serial.print("\nValue was incorrect, should be:");
     Serial.println(getMicrocodeHighByte(address), HEX);
@@ -43,14 +66,14 @@ void printAndVerifyMicrocodeHighByte(uint16_t address, byte value) {
 }
 
 void printAndVerifyMicrocodeLowByte(uint16_t address, byte value) {
-  printMicrocode(address, value);
+  printMemoryByte(address, value);
   if (getMicrocodeLowByte(address) != value) {
     Serial.print("\nValue was incorrect, should be:");
     Serial.println(getMicrocodeLowByte(address), HEX);
   }
 }
 
-void printMicrocode(uint16_t address, byte value) {
+void printMemoryByte(uint16_t address, byte value) {
   if (address != 0 && address % 64 == 0) {
     Serial.print('\n');
   }
@@ -61,20 +84,7 @@ void printMicrocode(uint16_t address, byte value) {
 }
 
 void testSpork8Mem() {
-  Spork8Config conf = {
-    .memoryIndex = 1,
-    .counterIndex = 0,
-    .selfIndex = 2,
-
-    .resetPin = 2,
-    .clockPin = 3,
-    .inIndexPins = {4, 5, 6},
-    .outIndexPins = {7, 8, 9},
-    .sharedSignalPins = {10, 11, 255, 255},
-    .busPins = {12, 13, A0, A1, A2, A3, A4, A5}
-  };
-  Spork8 spork8 = Spork8(conf);
-  spork8.setPinModes();
+  Spork8 spork8 = getNewSpork8();
 
   Serial.println("Writing test data");
   spork8.writeRange(0, 1 << 13, spork8TestData);
