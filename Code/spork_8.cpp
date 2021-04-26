@@ -24,7 +24,7 @@ void Spork8::setPinModes() {
   setBusMode(INPUT);
 }
 
-void Spork8::writeRange(uint16_t start, uint16_t len, WriteCallback callback) {
+void Spork8::writeRange(uint16_t start, uint16_t len, WriteCallback callback, bool reverseBits) {
   setCounterValue(start);
   setInIndex(conf.memoryIndex);
   setOutIndex(conf.selfIndex);
@@ -34,7 +34,7 @@ void Spork8::writeRange(uint16_t start, uint16_t len, WriteCallback callback) {
   for (uint16_t i = 0; i < len; i++) {
     uint16_t addr = start + i;
     byte value = callback(addr);
-    setBus(value);
+    setBus(value, reverseBits);
     cycleClock(); // Write current address
 
     if (((addr + 1) & pageMask) != (addr & pageMask)) {
@@ -52,7 +52,7 @@ void Spork8::writeRange(uint16_t start, uint16_t len, WriteCallback callback) {
   setBusMode(INPUT);
 }
 
-void Spork8::readRange(uint16_t start, uint16_t len, ReadCallback callback) {
+void Spork8::readRange(uint16_t start, uint16_t len, ReadCallback callback, bool reverseBits) {
   setCounterValue(start);
   setInIndex(conf.selfIndex);
   setOutIndex(conf.memoryIndex);
@@ -60,7 +60,7 @@ void Spork8::readRange(uint16_t start, uint16_t len, ReadCallback callback) {
   setBusMode(INPUT);
   for (uint16_t i = 0; i < len; i++) {
     standardDelay(); // Setup time
-    byte value = readBus();
+    byte value = readBus(reverseBits);
     callback(start + i, value);
     if (i != len - 1) { // Don't count on final address
       cycleClock();
@@ -68,23 +68,23 @@ void Spork8::readRange(uint16_t start, uint16_t len, ReadCallback callback) {
   }
 }
 
-void Spork8::writeAddress(uint16_t address, byte value) {
+void Spork8::writeAddress(uint16_t address, byte value, bool reverseBits) {
   setCounterValue(address);
   setOutIndex(conf.selfIndex);
   setInIndex(conf.memoryIndex);
   setBusMode(OUTPUT);
-  setBus(value);
+  setBus(value, reverseBits);
   standardDelay(); // Setup time
   cycleClock();
   setBusMode(INPUT);
 }
 
-byte Spork8::readAddress(uint16_t address) {
+byte Spork8::readAddress(uint16_t address, bool reverseBits) {
   setCounterValue(address);
   setInIndex(conf.selfIndex);
   setOutIndex(conf.memoryIndex);
   setBusMode(INPUT);
-  return readBus();
+  return readBus(reverseBits);
 }
 
 void Spork8::cycleClock() {
@@ -130,10 +130,11 @@ void Spork8::setBus(byte value, bool reverseBits) {
   }
 }
 
-byte Spork8::readBus() {
+byte Spork8::readBus(bool reverseBits) {
   byte value = 0;
   for (int i = 0; i < 8; i++) {
-    value |= digitalRead(conf.busPins[i]) << (7 - i);
+    byte b = reverseBits ? digitalRead(conf.busPins[i]) << i : digitalRead(conf.busPins[i]) << (7 - i);
+    value |= b;
   }
   return value;
 }

@@ -31,11 +31,11 @@ class Spork8 {
 
   void setPinModes();
 
-  void writeRange(uint16_t start, uint16_t len, WriteCallback callback);
-  void readRange(uint16_t start, uint16_t len, ReadCallback callback);
+  void writeRange(uint16_t start, uint16_t len, WriteCallback callback, bool reverseBits = false);
+  void readRange(uint16_t start, uint16_t len, ReadCallback callback, bool reverseBits = false);
 
-  void writeAddress(uint16_t address, byte value);
-  byte readAddress(uint16_t address);
+  void writeAddress(uint16_t address, byte value, bool reverseBits = false);
+  byte readAddress(uint16_t address, bool reverseBits = false);
   
   private:
   void cycleClock();
@@ -44,7 +44,7 @@ class Spork8 {
   void setOutIndex(byte index);
   void setCounterValue(uint16_t value);
   void setBus(byte value, bool reverseBits = false);
-  byte readBus();
+  byte readBus(bool reverseBits);
   void setBusMode(int mode);
   void setCounterModes(bool countEnable, bool byteSelect);
 };
