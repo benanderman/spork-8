@@ -252,51 +252,109 @@ byte getMicrocodeLowByte(uint16_t address) {
 }
 
 byte getTestProgramByte(uint16_t address) {
-  byte program[] = {
-    0,  1, // LDAI 1
-    1,  33, // LDBI 33
-    2,  65, // LDCI 65
-    13, 2, // ADDI 2
-    13, 4, // ADDI 4
-    13, 8, // ADDI 8
-    13, 16, // ADDI 16
-    13, 32, // ADDI 32
-    13, 64, // ADDI 64
-    13, 128, // ADDI 128
-    16, 0b10000001, // ANDI
-    16, 0b01000010, // ANDI
-    16, 0b00100100, // ANDI
-    16, 0b00011000, // ANDI
-    16, 0b00000000, // ANDI
-    13, 2, // ADDI 2
-    13, 4, // ADDI 4
-    13, 8, // ADDI 8
-    13, 16, // ADDI 16
-    13, 32, // ADDI 32
-    13, 64, // ADDI 64
-    13, 128, // ADDI 128
-    14, 2, // SUBI 2
-    14, 4, // SUBI 4
-    14, 8, // SUBI 8
-    14, 16, // SUBI 16
-    14, 32, // SUBI 32
-    14, 64, // SUBI 64
-    14, 128, // SUBI 128  ---- 29 * 2 = 58
-    9,  // RDIA
-    0,  0b10000000, // LDAI 128
-    17, // ANDIA
-    22, 0, 0, // JMPZ
-    0,  64, // LDAI 64
-    26, 0b00000000, // LDSI ---- 58 + 9 = 67
-    26, 0b10000000, // LDSI
-    26, 0b01000000, // LDSI
-    26, 0b11000000, // LDSI
-    14, 1, // SUBI 1
-    24, 0, 67, // JMPNZ
-    26, 0b00100000, // LDSI
-    26, 0b00000000, // LDSI
-    19, 0, 0, // JUMP 0
+  const unsigned char data[] = {
+    /* 0x00 */ 0x13, 0x00, 0x40, 0x09, 0x00, 0x80, 0x11, 0x18, 0x00, 0x13, 0x00, 0x40, 0x11, 0x18, 0x00, 0x40, 
+    /* 0x10 */ 0x13, 0x00, 0x03, 0x00, 0x80, 0x0f, 0x42, 0x16, 0x00, 0x30, 0x0f, 0x46, 0x16, 0x00, 0x30, 0x0f, 
+    /* 0x20 */ 0x62, 0x16, 0x00, 0x30, 0x0f, 0x66, 0x16, 0x00, 0x30, 0x1a, 0x00, 0x1a, 0x40, 0x13, 0x00, 0x34, 
+    /* 0x30 */ 0x1a, 0x20, 0x1a, 0x60, 0x0e, 0x01, 0x18, 0x00, 0x15, 0x1a, 0x80, 0x1a, 0x00, 0x13, 0x00, 0x03, 
+    /* 0x40 */ 0x00, 0x80, 0x1a, 0x00, 0x1a, 0x40, 0x0e, 0x01, 0x18, 0x00, 0x42, 0x1a, 0x80, 0x1a, 0x00, 0x13, 
+    /* 0x50 */ 0x00, 0x03
   };
-  int len = sizeof(program) / sizeof(*program);
-  return program[address % len];
+  int len = sizeof(data) / sizeof(*data);
+  return address < len ? data[address] : 0;
 }
+
+/*
+ * Program generated on https://hlorenzi.github.io/customasm/web/ from:
+
+#ruledef {
+  ldai     {value}       => 0x00 @ value`8
+  ldbi     {value}       => 0x01 @ value`8
+  ldci     {value}       => 0x02 @ value`8
+  lda      {address}     => 0x03 @ address`16
+  ldb      {address}     => 0x04 @ address`16
+  ldc      {address}     => 0x05 @ address`16
+  sta      {address}     => 0x06 @ address`16
+  stb      {address}     => 0x07 @ address`16
+  stc      {address}     => 0x08 @ address`16
+  rdia                   => 0x09 
+  rdib                   => 0x0A 
+  tiaa                   => 0x0B 
+  tiba                   => 0x0C 
+  addi     {value}       => 0x0D @ value`8
+  subi     {value}       => 0x0E @ value`8
+  cmpi     {value}       => 0x0F @ value`8
+  andi     {value}       => 0x10 @ value`8
+  andia                  => 0x11 
+  andib                  => 0x12 
+  jump     {address}     => 0x13 @ address`16
+  call     {address}     => 0x14 @ address`16
+  ret                    => 0x15 
+  jmpz     {address}     => 0x16 @ address`16
+  jmpc     {address}     => 0x17 @ address`16
+  jmpnz    {address}     => 0x18 @ address`16
+  jmpnc    {address}     => 0x19 @ address`16
+  ldsi     {value}       => 0x1A @ value`8
+  tas                    => 0x1B 
+}
+
+; Constants for updating an 8 x 16 shift-register display
+RCLCK  = 0b10000000
+SRCLCK = 0b01000000
+SER    = 0b00100000
+PIXELS = 8 * 16
+
+; Constants for input
+BUTTON_DISP   = 0b10000000
+BUTTON_CLEAR  = 0b01000000
+
+
+main:
+  jump clear_display
+  input_loop:
+    rdia
+    ldai BUTTON_DISP
+    andia
+    jmpnz display
+    ldai BUTTON_CLEAR
+    andia
+    jmpnz clear_display
+    jump input_loop
+
+display:
+  ldai PIXELS
+  .loop:
+    cmpi 16 * 4 + 2
+    jmpz .one
+    cmpi 16 * 4 + 6
+    jmpz .one
+    cmpi 16 * 6 + 2
+    jmpz .one
+    cmpi 16 * 6 + 6
+    jmpz .one
+    .zero:
+    ldsi 0
+    ldsi SRCLCK
+    jump .after_data
+    .one:
+      ldsi SER
+      ldsi SER | SRCLCK
+    .after_data:
+    subi 1
+    jmpnz .loop
+  ldsi RCLCK
+  ldsi 0
+  jump input_loop
+
+clear_display:
+  ldai PIXELS
+  .loop:
+    ldsi 0
+    ldsi SRCLCK
+    subi 1
+    jmpnz .loop
+  ldsi RCLCK
+  ldsi 0
+  jump input_loop
+  
+ */
