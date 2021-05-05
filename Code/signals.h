@@ -21,22 +21,22 @@
 
 // Bottom
 #define ZERO 0b0000 // Inner top left
-#define INDX 0b0001 // Inner bottom left
-#define STCK 0b0010 // Inner top right
-#define SRAM 0b0011 // Inner bottom right
+#define SRAM 0b0001 // Inner bottom left
+#define REGC 0b0010 // Inner top right
+#define INPA 0b0011 // Inner bottom right
 #define REGE 0b0100 // Outer top left
-#define INPA 0b0101 // Outer bottom left
+#define INDX 0b0101 // Outer bottom left
 #define MADR 0b0110 // Outer top right
 #define INPB 0b0111 // Outer bottom right
 
 // Top
 #define CLCK 0b1000 // Inner top left
 #define REGD 0b1001 // Inner bottom left
-#define REGB 0b1010 // Inner top right
-#define REGC 0b1011 // Inner bottom right
+#define REGA 0b1010 // Inner top right
+#define STCK 0b1011 // Inner bottom right
 #define PCNT 0b1100 // Outer top left
 #define PMEM 0b1101 // Outer bottom left
-#define REGA 0b1110 // Outer top right
+#define REGB 0b1110 // Outer top right
 #define ALU  0b1111 // Outer bottom right
 
 // Other signals; these are signals 8-15, which are least significant, so they start at 8 and go in reverse order
