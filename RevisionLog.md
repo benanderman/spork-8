@@ -7,7 +7,8 @@ This is to document all the issues (and fixes to them) of each revision of board
 * **RAM / ROM** fully works.
 * **Control Module**:
   * loads instructions from the bus randomly. It turns out that EEPROMs do not have floating outputs while new data is loaded after an address change, they have asserted random values, so pull-down resistors don't help. Since the instruction register inputs on `inverted clock & control word 15`, if `control word 15` fluctuates while the clock is low, it will trigger an erroneous read.
-  * Has a line above Zero flag, but it's not inverted.
+  * Has a (silkscreen) line above Zero flag, but it's not inverted.
+  * Reset seems to be pulled high, despite the 1k resistor pulling it low; particularly register modules will reset when they shouldn't, and it gets worse the more there are (that is, a second 1k resistor fixes it with some modules, but if more are added it's not enough).
 
 ## Revision 1
 
