@@ -1,14 +1,72 @@
 #ifndef INSTRUCTIONS_H
 #define INSTRUCTIONS_H
 
-#include "signals.h"
-
 #include <Arduino.h>
 
-uint16_t getMicrocode(uint16_t address);
-byte getMicrocodeHighByte(uint16_t address);
-byte getMicrocodeLowByte(uint16_t address);
+class Instruction {
+  public:
 
-byte getTestProgramByte(uint16_t address);
+  enum FlagsMask : byte {
+    UNCONDITIONAL = 0b1111,
+    NO_FLAGS      = 0b0001,
+    CF            = 0b0010,
+    ZF            = 0b0100,
+    ZF_CF         = 0b1000,
+  };
+
+  enum Type : byte {
+    Load,
+    LoadI,
+    LoadZP,
+    LoadN,
+    Store,
+    StoreI,
+    StoreZP,
+    StoreN,
+    Read,
+    Copy,
+    Jump,
+    Call,
+    Return,
+    Push,
+    Pop,
+    PushAll,
+    PopAll,
+    CmpI,
+    CmpAndI,
+    Cmp,
+    CmpAnd,
+    CmpReg,
+    CmpAndReg,
+    AddI,
+    SubI,
+    AndI,
+    OrI,
+    XorI,
+    Not,
+    Add,
+    Sub,
+    And,
+    Or,
+    Xor,
+    Nop,
+    Nop1,
+    Nop2,
+    Halt,
+  };
+
+  const Type type;
+  const byte flags_mask;
+  const byte data_bytes;
+  const uint16_t arg1;
+  const uint16_t arg2;
+  const uint16_t arg3;
+  
+  Instruction(Type type, byte flags_mask, byte data_bytes, uint16_t arg1 = 0, uint16_t arg2 = 0, uint16_t arg3 = 0);
+  uint16_t microCodeForCycleFlags(byte cycle, byte flags);
+
+  private:
+  uint16_t getMicrocode(byte cycle);
+};
 
 #endif

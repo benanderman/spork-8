@@ -21,19 +21,19 @@
 
 // Bottom
 #define ZERO 0b0000 // Inner top left
-#define SRAM 0b0001 // Inner bottom left
-#define REGC 0b0010 // Inner top right
-#define INPA 0b0011 // Inner bottom right
-#define REGE 0b0100 // Outer top left
-#define INDX 0b0101 // Outer bottom left
+#define STCK 0b0001 // Inner bottom left
+#define OUTA 0b0010 // Inner top right
+#define SRAM 0b0011 // Inner bottom right
+#define SWAP 0b0100 // Outer top left
+#define INPA 0b0101 // Outer bottom left
 #define MADR 0b0110 // Outer top right
 #define INPB 0b0111 // Outer bottom right
 
 // Top
 #define CLCK 0b1000 // Inner top left
-#define REGD 0b1001 // Inner bottom left
+#define OUTB 0b1001 // Inner bottom left
 #define REGA 0b1010 // Inner top right
-#define STCK 0b1011 // Inner bottom right
+#define REGC 0b1011 // Inner bottom right
 #define PCNT 0b1100 // Outer top left
 #define PMEM 0b1101 // Outer bottom left
 #define REGB 0b1110 // Outer top right

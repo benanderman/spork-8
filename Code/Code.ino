@@ -1,11 +1,12 @@
 #include "signals.h"
-#include "instructions.h"
+#include "instruction_set.h"
+#include "programs.h"
 #include "spork_8.h"
 
 void setup() {
   Serial.begin(57600);
-  writeTestProgram();
-//  writeMicrocode(false);
+//  writeProgram();
+  writeMicrocode(false);
 }
 
 void loop() {
@@ -31,20 +32,20 @@ Spork8 getNewSpork8() {
   return spork8;
 }
 
-void writeTestProgram() {
+void writeProgram() {
   Spork8 spork8 = getNewSpork8();
 
-  Serial.println("Writing test program");
-  spork8.writeRange(0, 1 << 13, getTestProgramByte, true);
+  Serial.println("Writing program");
+  spork8.writeRange(0, 1 << 13, getMovingDotByte, true);
   Serial.println("Reading");
   spork8.readRange(0, 1 << 13, printAndVerifyTestProgramByte, true);
 }
 
 void printAndVerifyTestProgramByte(uint16_t address, byte value) {
   printMemoryByte(address, value);
-  if (getTestProgramByte(address) != value) {
+  if (getMovingDotByte(address) != value) {
     Serial.print("\nValue was incorrect, should be:");
-    Serial.println(getTestProgramByte(address), HEX);
+    Serial.println(getMovingDotByte(address), HEX);
   }
 }
 
