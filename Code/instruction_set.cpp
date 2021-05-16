@@ -10,7 +10,7 @@ byte getMicrocodeLowByte(uint16_t address) {
   return getMicrocode(address) & 0xFF;
 }
 
-static Instruction instructions[] = {
+static const Instruction instructions[] = {
   Instruction(Instruction::Type::Load,      Instruction::FlagsMask::UNCONDITIONAL, 2, REGA),
   Instruction(Instruction::Type::Load,      Instruction::FlagsMask::UNCONDITIONAL, 2, REGB),
   Instruction(Instruction::Type::Load,      Instruction::FlagsMask::UNCONDITIONAL, 2, REGC),
@@ -163,8 +163,10 @@ uint16_t getMicrocode(uint16_t address) {
   byte flags = 1 << ((address & 0b110000) >> 4);
   byte inst = address >> 6;
 
+  static const Instruction noop = Instruction(Instruction::Type::Nop, Instruction::FlagsMask::UNCONDITIONAL, 0);
+  const Instruction *instruction = NULL;
   if (inst < sizeof(instructions) / sizeof(*instructions)) { // The instruction exists
-    return instructions[inst].microCodeForCycleFlags(mi, flags);
+    instruction = &instructions[inst];
   }
-  return 0;
+  return (instruction ? *instruction : noop).microCodeForCycleFlags(mi, flags);
 }

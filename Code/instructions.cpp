@@ -9,9 +9,9 @@ Instruction::Instruction(Type type, byte flags_mask, byte data_bytes, uint16_t a
   
 }
 
-uint16_t Instruction::microCodeForCycleFlags(byte cycle, byte flags) {
+uint16_t Instruction::microCodeForCycleFlags(byte cycle, byte flags) const {
   static const uint16_t base_microcode[] = {
-    OUT(PMEM) + INST_IN,
+    OUT(PMEM) | INST_IN,
     PCNT_COUNT
   };
   static const byte base_len = sizeof(base_microcode) / sizeof(*base_microcode);
@@ -30,63 +30,68 @@ uint16_t Instruction::microCodeForCycleFlags(byte cycle, byte flags) {
   return 0;
 }
 
-#define MICROCODE_CASE(inst, microcode) case inst: { static uint16_t mi[] = {microcode}; return cycle < ARRAY_LEN(mi) ? mi[cycle] : 0; }
+#define MC_START(inst) case Instruction::Type::inst: { uint16_t mi[] = {
+#define MC_END }; return cycle < ARRAY_LEN(mi) ? mi[cycle] : 0; }
 
-uint16_t Instruction::getMicrocode(byte cycle) {
+// Use progmem, for instructions that don't use arguments
+#define MC_START_PM(inst) case Instruction::Type::inst: { static const uint16_t mi[] PROGMEM = {
+#define MC_END_PM }; return cycle < ARRAY_LEN(mi) ? pgm_read_word(&mi[cycle]) : 0; }
+
+uint16_t Instruction::getMicrocode(byte cycle) const {
   switch (type) {
-    MICROCODE_CASE(Instruction::Type::Load, (
+    MC_START(Load)
       OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT,
       OUT(PMEM) | IN(MADR) | PCNT_COUNT,
       OUT(SRAM) | IN(arg1)
-    ));
-    MICROCODE_CASE(Instruction::Type::LoadI, (
+    MC_END
+    MC_START(LoadI)
       OUT(PMEM) | IN(arg1) | PCNT_COUNT
-    ));
-    MICROCODE_CASE(Instruction::Type::LoadZP, (
+    MC_END
+    MC_START(LoadZP)
       IN(MADR) | MADR_BSELECT,
       OUT(PMEM) | IN(MADR) | PCNT_COUNT,
       OUT(SRAM) | IN(arg1)
-    ));
-    MICROCODE_CASE(Instruction::Type::LoadN, (
+    MC_END
+    MC_START(LoadN)
       MADR_COUNT,
       OUT(SRAM) | IN(arg1)
-    ));
+    MC_END
 
-    MICROCODE_CASE(Instruction::Type::Store, (
+    MC_START(Store)
       OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT,
       OUT(PMEM) | IN(MADR) | PCNT_COUNT,
       OUT(arg1) | IN(SRAM)
-    ));
-    MICROCODE_CASE(Instruction::Type::StoreI, (
+    MC_END
+    MC_START_PM(StoreI)
       OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT,
       OUT(PMEM) | IN(MADR) | PCNT_COUNT,
       OUT(PMEM) | IN(SRAM) | PCNT_COUNT
-    ));
-    MICROCODE_CASE(Instruction::Type::StoreZP, (
+    MC_END_PM
+    MC_START(StoreZP)
       IN(MADR) | MADR_BSELECT,
       OUT(PMEM) | IN(MADR) | PCNT_COUNT,
       OUT(arg1) | IN(SRAM)
-    ));
-    MICROCODE_CASE(Instruction::Type::StoreN, (
+    MC_END
+    MC_START(StoreN)
       MADR_COUNT,
       OUT(arg1) | IN(SRAM)
-    ));
+    MC_END
     
-    MICROCODE_CASE(Instruction::Type::Read, (
+    MC_START(Read)
       IN(arg1)
-    ));
+    MC_END
     
-    MICROCODE_CASE(Instruction::Type::Copy, (
+    MC_START(Copy)
       OUT(arg1) | IN(arg2) | arg3
-    ));
+    MC_END
 
-    MICROCODE_CASE(Instruction::Type::Jump, (
+    MC_START_PM(Jump)
       OUT(PMEM) | IN(SWAP) | PCNT_COUNT,
       OUT(PMEM) | IN(PCNT),
       OUT(SWAP) | IN(PCNT) + PCNT_BSELECT
-    ));
+    MC_END_PM
 
-    MICROCODE_CASE(Instruction::Type::Call, (
+    MC_START_PM(Call)
       IN(MADR),                                             // Start at 0
       MADR_COUNT,                                           // Count to 1
       OUT(MADR)  | IN(SWAP),                                // Copy 1 to SWAP
@@ -101,8 +106,8 @@ uint16_t Instruction::getMicrocode(byte cycle) {
       OUT(PMEM)  | IN(SWAP)  | PCNT_COUNT,
       OUT(PMEM)  | IN(PCNT),
       OUT(SWAP)  | IN(PCNT)  | PCNT_BSELECT
-    ));
-    MICROCODE_CASE(Instruction::Type::Return, (
+    MC_END_PM
+    MC_START_PM(Return)
       IN(MADR),                             // Start at 0
       OUT(STCK)  | IN(REGA) | MADR_COUNT,   // Copy stack to register A, and count to 1
       OUT(MADR)  | IN(REGB),                // Copy 1 to register B
@@ -111,10 +116,10 @@ uint16_t Instruction::getMicrocode(byte cycle) {
       OUT(SRAM)  | IN(PCNT) | PCNT_BSELECT, // Copy more significant byte to instruction counter
       OUT(STCK)  | IN(MADR),                // Go to stack - 0
       OUT(SRAM)  | IN(PCNT),                // Copy less significant byte to instruction counter
-      OUT(ALU)   | IN(REGA),                // Copy stack - 1 to A, to get stack - 2
-      OUT(ALU)   | IN(STCK)                 // Copy stack - 2 back to stack pointer after decrements (2 bytes were consumed)
-    ));
-    MICROCODE_CASE(Instruction::Type::Push, (
+      OUT(ALU)   | IN(REGA) | PCNT_COUNT,   // Copy stack - 1 to A, to get stack - 2; skip past data byte 1 of Call*
+      OUT(ALU)   | IN(STCK) | PCNT_COUNT    // Copy stack - 2 back to stack pointer after decrements (2 bytes were consumed); skip past data byte 2 of Call*
+    MC_END_PM
+    MC_START(Push)
       IN(MADR),                                             // Start at 0
       MADR_COUNT,                                           // Count to 1
       OUT(MADR)  | IN(SWAP),                                // Copy 1 to SWAP
@@ -123,8 +128,8 @@ uint16_t Instruction::getMicrocode(byte cycle) {
       MADR_COUNT | OUT(SWAP) | IN(MADR)     | MADR_BSELECT, // Go to stack + 1, and write 0x01 to high byte to prevent overflow
       OUT(arg1)  | IN(SRAM),                                // Write register to stack
       OUT(MADR)  | IN(STCK)                                 // Write new stack pointer back to STCK
-    ));
-    MICROCODE_CASE(Instruction::Type::Pop, (
+    MC_END
+    MC_START(Pop)
       IN(MADR),                             // Start at 0
       OUT(STCK)  | IN(REGA) | MADR_COUNT,   // Copy stack to register A, and count to 1
       OUT(MADR)  | IN(REGB),                // Copy 1 to register B
@@ -132,8 +137,8 @@ uint16_t Instruction::getMicrocode(byte cycle) {
       OUT(STCK)  | IN(MADR),                // Go to stack pointer
       OUT(SRAM)  | IN(arg1),                // Copy value to register
       OUT(ALU)   | IN(STCK) | ALU_SUB       // Copy stack - 1 back to stack pointer
-    ));
-    MICROCODE_CASE(Instruction::Type::PushAll, (
+    MC_END
+    MC_START_PM(PushAll)
       IN(MADR),                                             // Start at 0
       MADR_COUNT,                                           // Count to 1
       OUT(MADR)  | IN(SWAP),                                // Copy 1 to SWAP
@@ -146,8 +151,8 @@ uint16_t Instruction::getMicrocode(byte cycle) {
       MADR_COUNT | OUT(SWAP) | IN(MADR)     | MADR_BSELECT, // Go to stack + 3, and write 0x01 to high byte to prevent overflow
       OUT(REGC)  | IN(SRAM),                                // Write register C to stack
       OUT(MADR)  | IN(STCK)                                 // Write new stack pointer back to STCK
-    ));
-    MICROCODE_CASE(Instruction::Type::PopAll, (
+    MC_END
+    MC_START_PM(PopAll)
       IN(MADR),                                             // Start at 0
       OUT(STCK)  | IN(REGA) | MADR_COUNT,                   // Copy stack to register A, and count to 1
       OUT(MADR)  | IN(REGB),                                // Copy 1 to register B
@@ -162,59 +167,59 @@ uint16_t Instruction::getMicrocode(byte cycle) {
       OUT(SRAM)  | IN(REGB),                                // Copy value of stack - 1 to register B, go to stack - 0
       MADR_COUNT | OUT(SWAP) | IN(MADR)     | MADR_BSELECT, // Go to stack - 0, and write 0x01 to high byte to prevent overflow
       OUT(SRAM)  | IN(REGC)                                 // Copy value of stack - 0 to register C
-    ));
-    MICROCODE_CASE(Instruction::Type::CmpI, (
+    MC_END
+    MC_START_PM(CmpI)
       OUT(PMEM)  | IN(REGB) | PCNT_COUNT,
       IN(ALU)    | OUT(ALU) | ALU_SUB     // Update flags
-    ));
-    MICROCODE_CASE(Instruction::Type::CmpAndI, (
+    MC_END_PM
+    MC_START_PM(CmpAndI)
       OUT(PMEM)  | IN(REGB) | PCNT_COUNT,
       IN(ALU)    | OUT(ALU) | ALU_AND    // Update flags
-    ));
-    MICROCODE_CASE(Instruction::Type::Cmp, (
+    MC_END_PM
+    MC_START_PM(Cmp)
       OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT,
       OUT(PMEM) | IN(MADR) | PCNT_COUNT,
       OUT(SRAM) | IN(REGB),
       IN(ALU)   | OUT(ALU) | ALU_SUB                    // Update flags
-    ));
-    MICROCODE_CASE(Instruction::Type::CmpAnd, (
+    MC_END_PM
+    MC_START_PM(CmpAnd)
       OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT,
       OUT(PMEM) | IN(MADR) | PCNT_COUNT,
       OUT(SRAM) | IN(REGB),
       IN(ALU)   | OUT(ALU) | ALU_AND                    // Update flags
-    ));
-    MICROCODE_CASE(Instruction::Type::CmpReg, (
+    MC_END_PM
+    MC_START(CmpReg)
       OUT(arg1)  | IN(REGB),
       IN(ALU)    | OUT(ALU) | ALU_SUB    // Update flags
-    ));
-    MICROCODE_CASE(Instruction::Type::CmpAndReg, (
+    MC_END
+    MC_START(CmpAndReg)
       OUT(arg1)  | IN(REGB),
       IN(ALU)    | OUT(ALU) | ALU_AND    // Update flags
-    ));
-    MICROCODE_CASE(Instruction::Type::AddI, (
+    MC_END
+    MC_START_PM(AddI)
       OUT(PMEM)  | IN(REGB) | PCNT_COUNT,
       IN(ALU)    | OUT(ALU),              // Update flags
       OUT(ALU)   | IN(REGA)
-    ));
-    MICROCODE_CASE(Instruction::Type::SubI, (
+    MC_END_PM
+    MC_START_PM(SubI)
       OUT(PMEM)  | IN(REGB) | PCNT_COUNT,
       IN(ALU)    | OUT(ALU) | ALU_SUB,    // Update flags
       OUT(ALU)   | IN(REGA)
-    ));
-    MICROCODE_CASE(Instruction::Type::AndI, (
+    MC_END_PM
+    MC_START_PM(AndI)
       OUT(PMEM)  | IN(REGB) | PCNT_COUNT,
       IN(ALU)    | OUT(ALU) | ALU_AND,    // Update flags
       OUT(ALU)   | IN(REGA) | ALU_AND
-    ));
-    MICROCODE_CASE(Instruction::Type::OrI, (
+    MC_END_PM
+    MC_START_PM(OrI)
       OUT(PMEM)  | IN(REGB) | PCNT_COUNT, // Copy value to B
       OUT(ALU)   | IN(SWAP) | ALU_AND,    // A & B -> Swap
       OUT(ALU)   | IN(REGA),              // A + B -> A
       OUT(SWAP)  | IN(REGB),              // Swap -> B
       IN(ALU)    | OUT(ALU) | ALU_SUB,    // Update flags
       OUT(ALU)   | IN(REGA) | ALU_SUB     // (A + B) - (A & B) -> A
-    ));
-    MICROCODE_CASE(Instruction::Type::XorI, (
+    MC_END_PM
+    MC_START_PM(XorI)
       OUT(PMEM)  | IN(REGB) | PCNT_COUNT, // Copy value to B
       OUT(ALU)   | IN(SWAP) | ALU_AND,    // A & B -> Swap
       OUT(ALU)   | IN(REGA),              // A + B -> A
@@ -222,8 +227,8 @@ uint16_t Instruction::getMicrocode(byte cycle) {
       OUT(ALU)   | IN(REGA) | ALU_SUB,    // (A + B) - (A & B) -> A
       IN(ALU)    | OUT(ALU) | ALU_SUB,    // Update flags
       OUT(ALU)   | IN(REGA) | ALU_SUB     // (A | B) - (A & B) -> A
-    ));
-    MICROCODE_CASE(Instruction::Type::Not, (
+    MC_END_PM
+    MC_START_PM(Not)
       IN(MADR),                              // 0 -> MADR
       OUT(REGA)  | IN(REGB),                 // A -> B
       IN(REGA)   | MADR_COUNT,               // 0 -> A, MADR count to 1
@@ -231,29 +236,29 @@ uint16_t Instruction::getMicrocode(byte cycle) {
       OUT(MADR)  | IN(REGB),                 // 1 -> B
       IN(ALU)    | OUT(ALU)    | ALU_SUB,    // Update flags
       OUT(ALU)   | IN(REGA)    | ALU_SUB     // (-A - 1) -> A
-    ));
-    MICROCODE_CASE(Instruction::Type::Add, (
+    MC_END_PM
+    MC_START_PM(Add)
       OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT,
       OUT(PMEM) | IN(MADR) | PCNT_COUNT,
       OUT(SRAM) | IN(REGB),
       IN(ALU)   | OUT(ALU),                             // Update flags
       OUT(ALU)  | IN(REGA)
-    ));
-    MICROCODE_CASE(Instruction::Type::Sub, (
+    MC_END_PM
+    MC_START_PM(Sub)
       OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT,
       OUT(PMEM) | IN(MADR) | PCNT_COUNT,
       OUT(SRAM) | IN(REGB),
       IN(ALU)   | OUT(ALU) | ALU_SUB,                   // Update flags
       OUT(ALU)  | IN(REGA) | ALU_SUB
-    ));
-    MICROCODE_CASE(Instruction::Type::And, (
+    MC_END_PM
+    MC_START_PM(And)
       OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT,
       OUT(PMEM) | IN(MADR) | PCNT_COUNT,
       OUT(SRAM) | IN(REGB),
       IN(ALU)   | OUT(ALU) | ALU_AND,                   // Update flags
       OUT(ALU)  | IN(REGA) | ALU_AND
-    ));
-    MICROCODE_CASE(Instruction::Type::Or, (
+    MC_END_PM
+    MC_START_PM(Or)
       OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT,
       OUT(PMEM) | IN(MADR) | PCNT_COUNT,
       OUT(SRAM) | IN(REGB),
@@ -262,8 +267,8 @@ uint16_t Instruction::getMicrocode(byte cycle) {
       OUT(SWAP) | IN(REGB),              // Swap -> B
       IN(ALU)   | OUT(ALU) | ALU_SUB,    // Update flags
       OUT(ALU)  | IN(REGA) | ALU_SUB     // (A + B) - (A & B) -> A
-    ));
-    MICROCODE_CASE(Instruction::Type::Xor, (
+    MC_END_PM
+    MC_START_PM(Xor)
       OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT,
       OUT(PMEM) | IN(MADR) | PCNT_COUNT,
       OUT(SRAM) | IN(REGB),
@@ -273,20 +278,20 @@ uint16_t Instruction::getMicrocode(byte cycle) {
       OUT(ALU)  | IN(REGA) | ALU_SUB,    // (A + B) - (A & B) -> A
       IN(ALU)   | OUT(ALU) | ALU_SUB,    // Update flags
       OUT(ALU)  | IN(REGA) | ALU_SUB     // (A | B) - (A & B) -> A
-    ));
-    MICROCODE_CASE(Instruction::Type::Nop, (
+    MC_END_PM
+    MC_START_PM(Nop)
       0
-    ));
-    MICROCODE_CASE(Instruction::Type::Nop1, (
+    MC_END_PM
+    MC_START_PM(Nop1)
       IN(CLCK)
-    ));
-    MICROCODE_CASE(Instruction::Type::Nop2, (
+    MC_END_PM
+    MC_START_PM(Nop2)
       IN(CLCK),
       IN(CLCK)
-    ));
-    MICROCODE_CASE(Instruction::Type::Halt, (
+    MC_END_PM
+    MC_START_PM(Halt)
       0 // Handled elsewhere
-    ));
+    MC_END_PM
   }
   return 0;
 }

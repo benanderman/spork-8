@@ -63,10 +63,10 @@ class Instruction {
   const uint16_t arg3;
   
   Instruction(Type type, byte flags_mask, byte data_bytes, uint16_t arg1 = 0, uint16_t arg2 = 0, uint16_t arg3 = 0);
-  uint16_t microCodeForCycleFlags(byte cycle, byte flags);
+  uint16_t microCodeForCycleFlags(byte cycle, byte flags) const;
 
   private:
-  uint16_t getMicrocode(byte cycle);
+  uint16_t getMicrocode(byte cycle) const;
 };
 
 #endif

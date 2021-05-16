@@ -2,11 +2,15 @@
 #include "instruction_set.h"
 #include "programs.h"
 #include "spork_8.h"
+#include "instructions.h"
+
+Spork8::WriteCallback verifyCallback = NULL;
 
 void setup() {
   Serial.begin(57600);
 //  writeProgram();
-  writeMicrocode(false);
+  writeMicrocode(true);
+//  printMicrocode();
 }
 
 void loop() {
@@ -38,39 +42,27 @@ void writeProgram() {
   Serial.println("Writing program");
   spork8.writeRange(0, 1 << 13, getMovingDotByte, true);
   Serial.println("Reading");
-  spork8.readRange(0, 1 << 13, printAndVerifyTestProgramByte, true);
-}
-
-void printAndVerifyTestProgramByte(uint16_t address, byte value) {
-  printMemoryByte(address, value);
-  if (getMovingDotByte(address) != value) {
-    Serial.print("\nValue was incorrect, should be:");
-    Serial.println(getMovingDotByte(address), HEX);
-  }
+  verifyCallback = getMovingDotByte;
+  spork8.readRange(0, 1 << 13, printAndVerifyByte, true);
 }
 
 void writeMicrocode(bool highBytes) {
   Spork8 spork8 = getNewSpork8();
-
+  Spork8::WriteCallback callback = highBytes ? getMicrocodeHighByte : getMicrocodeLowByte;
   Serial.println("Writing microcode");
-  spork8.writeRange(0, 1 << 13, highBytes ? getMicrocodeHighByte : getMicrocodeLowByte);
+  spork8.writeRange(0, 1 << 13, callback);
   Serial.println("Reading");
-  spork8.readRange(0, 1 << 13, highBytes ? printAndVerifyMicrocodeHighByte : printAndVerifyMicrocodeLowByte);
+  verifyCallback = callback;
+  spork8.readRange(0, 1 << 13, printAndVerifyByte);
 }
 
-void printAndVerifyMicrocodeHighByte(uint16_t address, byte value) {
-  printMemoryByte(address, value);
-  if (getMicrocodeHighByte(address) != value) {
-    Serial.print("\nValue was incorrect, should be:");
-    Serial.println(getMicrocodeHighByte(address), HEX);
+void printMicrocode() {  
+  for (int i = 0; i < 1 << 13; i++) {
+    printMemoryByte(i, getMicrocodeLowByte(i));
   }
-}
-
-void printAndVerifyMicrocodeLowByte(uint16_t address, byte value) {
-  printMemoryByte(address, value);
-  if (getMicrocodeLowByte(address) != value) {
-    Serial.print("\nValue was incorrect, should be:");
-    Serial.println(getMicrocodeLowByte(address), HEX);
+  Serial.print("\n\n");
+  for (int i = 0; i < 1 << 13; i++) {
+    printMemoryByte(i, getMicrocodeHighByte(i));
   }
 }
 
@@ -84,30 +76,12 @@ void printMemoryByte(uint16_t address, byte value) {
   Serial.print(value, HEX);
 }
 
-void testSpork8Mem() {
-  Spork8 spork8 = getNewSpork8();
-
-  Serial.println("Writing test data");
-  spork8.writeRange(0, 1 << 13, spork8TestData);
-  Serial.println("Reading");
-  spork8.readRange(0, 1 << 13, printSpork8TestData);
-}
-
-byte spork8TestData(uint16_t address) {
-  const char *test = "0 1 2 3 4 5 6 7 ";
-  return test[address % strlen(test)];
-}
-
-void printSpork8TestData(uint16_t address, byte value) {
-  if (address != 0 && address % 64 == 0) {
-    Serial.print('\n');
-  }
-  if (value < 16) {
-    Serial.print('0'); // leading zero
-  }
-  Serial.print(value, HEX);
-  if (spork8TestData(address) != value) {
-    Serial.print("\nValue was incorrect, should be:");
-    Serial.println(spork8TestData(address), HEX);
+void printAndVerifyByte(uint16_t address, byte value) {
+//  printMemoryByte(address, verifyCallback(address));
+  printMemoryByte(address, value);
+  if (verifyCallback(address) != value) {
+    Serial.print("!");
+    Serial.print(verifyCallback(address), HEX);
+    Serial.print("!");
   }
 }
