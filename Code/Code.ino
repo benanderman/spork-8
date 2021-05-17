@@ -8,9 +8,10 @@ Spork8::WriteCallback verifyCallback = NULL;
 
 void setup() {
   Serial.begin(57600);
-//  writeProgram();
-  writeMicrocode(true);
+  writeProgram();
+//  writeMicrocode(false);
 //  printMicrocode();
+//  printTestMicrocode();
 }
 
 void loop() {
@@ -55,6 +56,17 @@ void writeMicrocode(bool highBytes) {
   verifyCallback = callback;
   spork8.readRange(0, 1 << 13, printAndVerifyByte);
 }
+
+//void printTestMicrocode() {
+//  Instruction inst = Instruction(Instruction::Type::PushAll,   Instruction::FlagsMask::UNCONDITIONAL, 0);
+//  Serial.print("\n");
+//  for (int f = 0; f < 4; f++) {
+//    for (int i = 0; i < 16; i++) {
+//      printMemoryByte(i, inst.microCodeForCycleFlags(i, 1 << f) >> 8);
+//    }
+//    Serial.print("\n");
+//  }
+//}
 
 void printMicrocode() {  
   for (int i = 0; i < 1 << 13; i++) {

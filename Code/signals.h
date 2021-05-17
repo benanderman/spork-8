@@ -51,8 +51,8 @@
 
 // Utils
 // A micro-instruction can be made up of: IN(register) + OUT(register) + [other signals]
-#define IN(reg)        uint16_t(reg << 12)
-#define OUT(reg)       uint16_t(reg <<  8)
+#define IN(reg)        (uint16_t(reg) << 12)
+#define OUT(reg)       (uint16_t(reg) <<  8)
 #define FLAGS_OUT(reg) IN(reg) // Only for ALU
 
 #endif

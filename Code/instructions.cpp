@@ -34,8 +34,8 @@ uint16_t Instruction::microCodeForCycleFlags(byte cycle, byte flags) const {
 #define MC_END }; return cycle < ARRAY_LEN(mi) ? mi[cycle] : 0; }
 
 // Use progmem, for instructions that don't use arguments
-#define MC_START_PM(inst) case Instruction::Type::inst: { static const uint16_t mi[] PROGMEM = {
-#define MC_END_PM }; return cycle < ARRAY_LEN(mi) ? pgm_read_word(&mi[cycle]) : 0; }
+#define MC_START_PM(inst) case Instruction::Type::inst: { static const uint16_t mi_pm[] PROGMEM = {
+#define MC_END_PM }; return cycle < ARRAY_LEN(mi_pm) ? pgm_read_word(&mi_pm[cycle]) : 0; }
 
 uint16_t Instruction::getMicrocode(byte cycle) const {
   switch (type) {
@@ -108,16 +108,16 @@ uint16_t Instruction::getMicrocode(byte cycle) const {
       OUT(SWAP)  | IN(PCNT)  | PCNT_BSELECT
     MC_END_PM
     MC_START_PM(Return)
-      IN(MADR),                             // Start at 0
-      OUT(STCK)  | IN(REGA) | MADR_COUNT,   // Copy stack to register A, and count to 1
-      OUT(MADR)  | IN(REGB),                // Copy 1 to register B
-      OUT(REGB)  | IN(MADR) | MADR_BSELECT, // Go to stack, at high byte 0x01
-      OUT(ALU)   | IN(MADR) | ALU_SUB,      // Go to stack - 1
-      OUT(SRAM)  | IN(PCNT) | PCNT_BSELECT, // Copy more significant byte to instruction counter
-      OUT(STCK)  | IN(MADR),                // Go to stack - 0
-      OUT(SRAM)  | IN(PCNT),                // Copy less significant byte to instruction counter
-      OUT(ALU)   | IN(REGA) | PCNT_COUNT,   // Copy stack - 1 to A, to get stack - 2; skip past data byte 1 of Call*
-      OUT(ALU)   | IN(STCK) | PCNT_COUNT    // Copy stack - 2 back to stack pointer after decrements (2 bytes were consumed); skip past data byte 2 of Call*
+      IN(MADR),                                       // Start at 0
+      OUT(STCK)  | IN(REGA) | MADR_COUNT,             // Copy stack to register A, and count to 1
+      OUT(MADR)  | IN(REGB),                          // Copy 1 to register B
+      OUT(REGB)  | IN(MADR) | MADR_BSELECT,           // Go to stack, at high byte 0x01
+      OUT(ALU)   | IN(MADR) | ALU_SUB,                // Go to stack - 1
+      OUT(SRAM)  | IN(PCNT) | PCNT_BSELECT,           // Copy more significant byte to instruction counter
+      OUT(STCK)  | IN(MADR),                          // Go to stack - 0
+      OUT(SRAM)  | IN(PCNT),                          // Copy less significant byte to instruction counter
+      OUT(ALU)   | IN(REGA) | ALU_SUB | PCNT_COUNT,   // Copy stack - 1 to A, to get stack - 2; skip past data byte 1 of Call*
+      OUT(ALU)   | IN(STCK) | ALU_SUB | PCNT_COUNT    // Copy stack - 2 back to stack pointer after decrements (2 bytes were consumed); skip past data byte 2 of Call*
     MC_END_PM
     MC_START(Push)
       IN(MADR),                                             // Start at 0
@@ -151,7 +151,7 @@ uint16_t Instruction::getMicrocode(byte cycle) const {
       MADR_COUNT | OUT(SWAP) | IN(MADR)     | MADR_BSELECT, // Go to stack + 3, and write 0x01 to high byte to prevent overflow
       OUT(REGC)  | IN(SRAM),                                // Write register C to stack
       OUT(MADR)  | IN(STCK)                                 // Write new stack pointer back to STCK
-    MC_END
+    MC_END_PM
     MC_START_PM(PopAll)
       IN(MADR),                                             // Start at 0
       OUT(STCK)  | IN(REGA) | MADR_COUNT,                   // Copy stack to register A, and count to 1
@@ -161,13 +161,13 @@ uint16_t Instruction::getMicrocode(byte cycle) const {
       OUT(ALU)   | IN(REGA) | ALU_SUB,                      // -1
       OUT(ALU)   | IN(MADR) | ALU_SUB,                      // Go to stack - 2
       OUT(ALU)   | IN(REGA) | ALU_SUB,                      // Put stack - 2 into REGA
-      OUT(MADR)  | IN(STCK) | ALU_SUB,                      // Copy stack - 3 back to stack pointer
+      OUT(ALU)   | IN(STCK) | ALU_SUB,                      // Copy stack - 3 back to stack pointer
       OUT(SRAM)  | IN(REGA),                                // Copy value of stack - 2 to register A
       MADR_COUNT | OUT(SWAP) | IN(MADR)     | MADR_BSELECT, // Go to stack - 1, and write 0x01 to high byte to prevent overflow
       OUT(SRAM)  | IN(REGB),                                // Copy value of stack - 1 to register B, go to stack - 0
       MADR_COUNT | OUT(SWAP) | IN(MADR)     | MADR_BSELECT, // Go to stack - 0, and write 0x01 to high byte to prevent overflow
       OUT(SRAM)  | IN(REGC)                                 // Copy value of stack - 0 to register C
-    MC_END
+    MC_END_PM
     MC_START_PM(CmpI)
       OUT(PMEM)  | IN(REGB) | PCNT_COUNT,
       IN(ALU)    | OUT(ALU) | ALU_SUB     // Update flags
@@ -204,7 +204,7 @@ uint16_t Instruction::getMicrocode(byte cycle) const {
     MC_START_PM(SubI)
       OUT(PMEM)  | IN(REGB) | PCNT_COUNT,
       IN(ALU)    | OUT(ALU) | ALU_SUB,    // Update flags
-      OUT(ALU)   | IN(REGA)
+      OUT(ALU)   | IN(REGA) | ALU_SUB
     MC_END_PM
     MC_START_PM(AndI)
       OUT(PMEM)  | IN(REGB) | PCNT_COUNT,

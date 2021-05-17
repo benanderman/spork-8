@@ -10,6 +10,7 @@ static void standardDelay() {
 
 static const int pageWriteDelay = 11; // ms
 static const uint16_t pageMask = 0b1111111000000;
+static const int pageSize = 64;
 
 void Spork8::setPinModes() {
   pinMode(conf.resetPin, OUTPUT);
@@ -31,9 +32,19 @@ void Spork8::writeRange(uint16_t start, uint16_t len, WriteCallback callback, bo
   setCounterModes(false, false);
   standardDelay(); // Setup time
   setBusMode(OUTPUT);
+  
+  uint8_t page_cache[64];
   for (uint16_t i = 0; i < len; i++) {
     uint16_t addr = start + i;
-    byte value = callback(addr);
+
+    // At the beginning of a page, pre-calculate the whole page to make writes fast enough
+    if (i == 0 || addr % pageSize == 0) {
+      for (int p = addr; (p & pageMask) == (addr & pageMask); p++) {
+        page_cache[p % pageSize] = callback(p);
+      }
+    }
+    
+    byte value = page_cache[addr % pageSize];
     setBus(value, reverseBits);
     cycleClock(); // Write current address
 

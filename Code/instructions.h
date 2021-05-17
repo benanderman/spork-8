@@ -58,9 +58,9 @@ class Instruction {
   const Type type;
   const byte flags_mask;
   const byte data_bytes;
-  const uint16_t arg1;
-  const uint16_t arg2;
-  const uint16_t arg3;
+  const uint8_t arg1;
+  const uint8_t arg2;
+  const uint8_t arg3;
   
   Instruction(Type type, byte flags_mask, byte data_bytes, uint16_t arg1 = 0, uint16_t arg2 = 0, uint16_t arg3 = 0);
   uint16_t microCodeForCycleFlags(byte cycle, byte flags) const;
