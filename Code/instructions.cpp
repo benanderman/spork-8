@@ -232,7 +232,7 @@ uint16_t Instruction::getMicrocode(byte cycle) const {
       IN(MADR),                              // 0 -> MADR
       OUT(REGA)  | IN(REGB),                 // A -> B
       IN(REGA)   | MADR_COUNT,               // 0 -> A, MADR count to 1
-      OUT(ALU)   | IN(REGA),                 // 0 - B -> A
+      OUT(ALU)   | IN(REGA)    | ALU_SUB,    // 0 - B -> A
       OUT(MADR)  | IN(REGB),                 // 1 -> B
       IN(ALU)    | OUT(ALU)    | ALU_SUB,    // Update flags
       OUT(ALU)   | IN(REGA)    | ALU_SUB     // (-A - 1) -> A
