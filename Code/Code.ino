@@ -8,10 +8,12 @@ Spork8::WriteCallback verifyCallback = NULL;
 
 void setup() {
   Serial.begin(57600);
+//  disableSDP();
   writeProgram();
-//  writeMicrocode(false);
+//  writeMicrocode(true);
 //  printMicrocode();
 //  printTestMicrocode();
+//  read256();
 }
 
 void loop() {
@@ -37,6 +39,29 @@ Spork8 getNewSpork8() {
   return spork8;
 }
 
+void read256() {
+  Spork8 spork8 = getNewSpork8();
+  spork8.readRange(0, 1 << 15, printMemoryByte);
+}
+
+// May or may not work. Not sure whether reverseBits should be true or false.
+void disableSDP() {
+  Spork8 spork8 = getNewSpork8();
+  delay(10);
+  spork8.writeAddress(0x5555, 0xAA, false);
+  delay(10);
+  spork8.writeAddress(0x2AAA, 0x55, false);
+  delay(10);
+  spork8.writeAddress(0x5555, 0x80, false);
+  delay(10);
+  spork8.writeAddress(0x5555, 0xAA, false);
+  delay(10);
+  spork8.writeAddress(0x2AAA, 0x55, false);
+  delay(10);
+  spork8.writeAddress(0x5555, 0x20, false);
+  delay(10);
+}
+
 void writeProgram() {
   Spork8 spork8 = getNewSpork8();
 
@@ -51,10 +76,10 @@ void writeMicrocode(bool highBytes) {
   Spork8 spork8 = getNewSpork8();
   Spork8::WriteCallback callback = highBytes ? getMicrocodeHighByte : getMicrocodeLowByte;
   Serial.println("Writing microcode");
-  spork8.writeRange(0, 1 << 13, callback);
+  spork8.writeRange(0, 1 << 15, callback);
   Serial.println("Reading");
   verifyCallback = callback;
-  spork8.readRange(0, 1 << 13, printAndVerifyByte);
+  spork8.readRange(0, 1 << 15, printAndVerifyByte);
 }
 
 //void printTestMicrocode() {

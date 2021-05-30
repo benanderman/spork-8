@@ -27,6 +27,17 @@ my %flags_mapping = (
     "ZF|NO_FLAGS"   => "NC",
 );
 
+sub mappedName {
+    my $name = shift;
+    if (!defined $name) {
+        return "";
+    }
+    if ($name =~ /^\d+$/) {
+        return $name;
+    }
+    return $name_map{$name};
+}
+
 my $instructions_file = `cat Code/instruction_set.cpp` or die "Couldn't read instructions file.\n";
 if ($instructions_file =~ /Instruction instructions\[\] = \{(.+?)\}/s) {
     my $instructions_block = $1;
@@ -40,9 +51,9 @@ if ($instructions_file =~ /Instruction instructions\[\] = \{(.+?)\}/s) {
         my $flags_suffix = $flags_mapping{"$flags1$flags2"};
         my $inst = "$1$flags_suffix";
         my $data_bytes = $4;
-        my $var1 = $5 ? $name_map{$5} : "";
-        my $var2 = $6 ? ", $name_map{$6}" : "";
-        my $var3 = $7 ? ", $name_map{$7}" : "";
+        my $var1 = mappedName($5);
+        my $var2 = defined $6 ? ", ".mappedName($6) : "";
+        my $var3 = defined $7 ? ", ".mappedName($7) : "";
         my $vars = "$var1$var2$var3";
         if ($data_bytes != 0) {
             $arg_template = $data_bytes == 1 ? "{value}" : "{address}";

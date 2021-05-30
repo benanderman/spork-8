@@ -39,6 +39,19 @@ uint16_t Instruction::microCodeForCycleFlags(byte cycle, byte flags) const {
 
 uint16_t Instruction::getMicrocode(byte cycle) const {
   switch (type) {
+    MC_START(SetPageReg)
+      OUT(arg1) | IN(MADR) | MADR_BSELECT
+    MC_END
+    MC_START_PM(SetPageI)
+      OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT
+    MC_END_PM
+    MC_START(SetAddrReg)
+      OUT(arg1) | IN(MADR)
+    MC_END
+    MC_START_PM(SetAddrI)
+      OUT(PMEM) | IN(MADR) | PCNT_COUNT
+    MC_END_PM
+    
     MC_START(Load)
       OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT,
       OUT(PMEM) | IN(MADR) | PCNT_COUNT,
@@ -52,9 +65,13 @@ uint16_t Instruction::getMicrocode(byte cycle) const {
       OUT(PMEM) | IN(MADR) | PCNT_COUNT,
       OUT(SRAM) | IN(arg1)
     MC_END
-    MC_START(LoadN)
-      MADR_COUNT,
+    MC_START(LoadP)
+      OUT(PMEM) | IN(MADR) | PCNT_COUNT,
       OUT(SRAM) | IN(arg1)
+    MC_END
+    MC_START(LoadInc)
+      OUT(SRAM) | IN(arg1),
+      arg2 > 0 ? uint16_t(MADR_COUNT) : 0
     MC_END
 
     MC_START(Store)
@@ -72,9 +89,13 @@ uint16_t Instruction::getMicrocode(byte cycle) const {
       OUT(PMEM) | IN(MADR) | PCNT_COUNT,
       OUT(arg1) | IN(SRAM)
     MC_END
-    MC_START(StoreN)
-      MADR_COUNT,
+    MC_START(StoreP)
+      OUT(PMEM) | IN(MADR) | PCNT_COUNT,
       OUT(arg1) | IN(SRAM)
+    MC_END
+    MC_START(StoreInc)
+      OUT(arg1) | IN(SRAM),
+      arg2 > 0 ? uint16_t(MADR_COUNT) : 0
     MC_END
     
     MC_START(Read)
@@ -195,6 +216,38 @@ uint16_t Instruction::getMicrocode(byte cycle) const {
     MC_START(CmpAndReg)
       OUT(arg1)  | IN(REGB),
       IN(ALU)    | OUT(ALU) | ALU_AND    // Update flags
+    MC_END
+    MC_START(Mult)
+      arg1 > 0 ? OUT(REGA)  | IN(REGB) : IN(REGA), // Multiply by 0 = 0
+      arg1 > 0 ? OUT(ALU)   | IN(REGA) : 0,
+      arg1 > 1 ? OUT(ALU)   | IN(REGA) : 0,
+      arg1 > 2 ? OUT(ALU)   | IN(REGA) : 0,
+      arg1 > 3 ? OUT(ALU)   | IN(REGA) : 0,
+      arg1 > 4 ? OUT(ALU)   | IN(REGA) : 0,
+      arg1 > 5 ? OUT(ALU)   | IN(REGA) : 0,
+      arg1 > 6 ? OUT(ALU)   | IN(REGA) : 0,
+      arg1 > 7 ? OUT(ALU)   | IN(REGA) : 0,
+      arg1 > 8 ? OUT(ALU)   | IN(REGA) : 0,
+      arg1 > 9 ? OUT(ALU)   | IN(REGA) : 0,
+      arg1 > 10 ? OUT(ALU)  | IN(REGA) : 0,
+      arg1 > 11 ? OUT(ALU)  | IN(REGA) : 0,
+      arg1 > 12 ? OUT(ALU)  | IN(REGA) : 0
+    MC_END
+    MC_START(ShiftL)
+      arg1 > 0 ? OUT(REGA)  | IN(REGB) : 0,
+      arg1 > 0 ? OUT(ALU)   | IN(REGA) : 0,
+      arg1 > 1 ? OUT(REGA)  | IN(REGB) : 0,
+      arg1 > 1 ? OUT(ALU)   | IN(REGA) : 0,
+      arg1 > 2 ? OUT(REGA)  | IN(REGB) : 0,
+      arg1 > 2 ? OUT(ALU)   | IN(REGA) : 0,
+      arg1 > 3 ? OUT(REGA)  | IN(REGB) : 0,
+      arg1 > 3 ? OUT(ALU)   | IN(REGA) : 0,
+      arg1 > 4 ? OUT(REGA)  | IN(REGB) : 0,
+      arg1 > 4 ? OUT(ALU)   | IN(REGA) : 0,
+      arg1 > 5 ? OUT(REGA)  | IN(REGB) : 0,
+      arg1 > 5 ? OUT(ALU)   | IN(REGA) : 0,
+      arg1 > 6 ? OUT(REGA)  | IN(REGB) : 0,
+      arg1 > 6 ? OUT(ALU)   | IN(REGA) : 0
     MC_END
     MC_START_PM(AddI)
       OUT(PMEM)  | IN(REGB) | PCNT_COUNT,
