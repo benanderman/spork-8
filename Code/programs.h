@@ -4,5 +4,6 @@
 #include <Arduino.h>
 
 byte getMovingDotByte(uint16_t address);
+byte getSnakeByte(uint16_t address);
 
 #endif

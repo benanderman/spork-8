@@ -66,9 +66,9 @@ void writeProgram() {
   Spork8 spork8 = getNewSpork8();
 
   Serial.println("Writing program");
-  spork8.writeRange(0, 1 << 13, getMovingDotByte, true);
+  spork8.writeRange(0, 1 << 13, getSnakeByte, true);
   Serial.println("Reading");
-  verifyCallback = getMovingDotByte;
+  verifyCallback = getSnakeByte;
   spork8.readRange(0, 1 << 13, printAndVerifyByte, true);
 }
 
