@@ -2,6 +2,10 @@
 
 This is an 8-bit computer project, based heavily on [Ben Eater's 8-bit breadboard computer](https://eater.net/8bit). It's made out of modular PCBs that plug into each other, and contain mostly 74LS-series chips. It runs code from an EEPROM (so it's only programmable from a computer), and has separate memory. It's meant to display what's happening, when running on a 555-timer or manually stepping, but also be capable enough to implement some sort of game, when using an oscillator as a clock.
 
+## Status of project
+
+The project was technically completed and running, with several issues and workarounds (see [RevisionLog](RevisionLog.md)). However, the flags register chip (a 74LS173) was a little bit unreliable, and trying to fix it broke it completely, which broke branching execution. Then, accidentally plugging a bus board in with an offset (so the pins were connected wrong) resulted in the clock being partially broken as well (changing modes doesn't "stick", so you have to hold down the button). I'm slowly working on fixing all the issues that needed workarounds, and adding a couple features, and plan to re-order and re-assemble all boards but using 74HC-series CMOS chips instead of 74LS-series TTL chips, so that it can use MUCH less power, and be easily powered by USB. When I order the parts, I'll also get more 74LS173 chips, so I can attempt to fix the existing flags register.
+
 ## Modules
  * **Control module**: Coordinates everything else. Contains the micro-code EEPROMs, instruction register, micro-instruction counter, power input, reset button, and logic to interface with modules through bus boards.
  * **Bus**: Four of these interface between the control module and up to 16 other modules. These demux three signal lines each for in/out enable signals to the four modules connected to each bus board. One bus board plugs into the top of the control module, and one into the bottom. A second bus board plugs into the first ones. The first in/out signal line selects between the two boards on top / bottom, and the one connected to the control module inverts the signal before passing it onto the other bus board.
