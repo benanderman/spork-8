@@ -1,3 +1,6 @@
 .idea
 .DS_Store
+*-bak
+*-cache.lib
+~*.lck
 

@@ -532,21 +532,21 @@ Wire Wire Line
 	4250 900  4250 1050
 Wire Wire Line
 	4150 900  4150 1050
-Text GLabel 7800 4500 1    50   Input ~ 0
-R0
-Text GLabel 8150 4500 1    50   Input ~ 0
-R1
-Text GLabel 8500 4500 1    50   Input ~ 0
-R2
-Text GLabel 8850 4500 1    50   Input ~ 0
-R3
-Text GLabel 9250 4500 1    50   Input ~ 0
-R4
-Text GLabel 9600 4500 1    50   Input ~ 0
-R5
-Text GLabel 9950 4500 1    50   Input ~ 0
-R6
 Text GLabel 10300 4500 1    50   Input ~ 0
+R0
+Text GLabel 9950 4500 1    50   Input ~ 0
+R1
+Text GLabel 9600 4500 1    50   Input ~ 0
+R2
+Text GLabel 9250 4500 1    50   Input ~ 0
+R3
+Text GLabel 8850 4500 1    50   Input ~ 0
+R4
+Text GLabel 8500 4500 1    50   Input ~ 0
+R5
+Text GLabel 8150 4500 1    50   Input ~ 0
+R6
+Text GLabel 7800 4500 1    50   Input ~ 0
 R7
 Wire Wire Line
 	10300 4500 10300 4650

@@ -11,7 +11,7 @@
     (via_costs 50)
     (plane_via_costs 5)
     (start_ripup_costs 100)
-    (start_pass_no 3783)
+    (start_pass_no 82)
     (layer_rule F.Cu
       (active on)
       (preferred_direction horizontal)
@@ -27,9 +27,11 @@
   )
   (rule
     (width 250.0)
-    (clear 200.2)
-    (clear 125.0 (type smd_to_turn_gap))
-    (clear 50.0 (type smd_smd))
+    (clearance 200.2)
+    (clearance 125.0 (type smd_to_turn_gap))
+    (clearance 50.0 (type smd))
+    (clearance 200.2 (type "kicad_default"))
+    (clearance 200.2 (type Power))
   )
   (padstack "Via[0-1]_800:400_um"
     (shape
@@ -46,11 +48,17 @@
   (via 
     "Via[0-1]_800:400_um-kicad_default" "Via[0-1]_800:400_um" "kicad_default"
   )
+  (via 
+    "Via[0-1]_800:400_um-Power" "Via[0-1]_800:400_um" Power
+  )
   (via_rule
     default "Via[0-1]_800:400_um"
   )
   (via_rule
     "kicad_default" "Via[0-1]_800:400_um-kicad_default"
+  )
+  (via_rule
+    Power "Via[0-1]_800:400_um-Power"
   )
   (class default
     (clearance_class default)
@@ -63,25 +71,35 @@
     )
   )
   (class "kicad_default"
-    "Net-(D1-Pad2)" "Net-(D1-Pad1)" "Net-(D2-Pad2)" "Net-(D2-Pad1)" "Net-(D3-Pad2)" "Net-(D3-Pad1)" "Net-(D4-Pad2)" "Net-(D4-Pad1)"
-    "Net-(D5-Pad2)" "Net-(D5-Pad1)" "Net-(D6-Pad2)" "Net-(D6-Pad1)" "Net-(D7-Pad2)" "Net-(D7-Pad1)" "Net-(D8-Pad2)" "Net-(D8-Pad1)"
-    "Net-(D9-Pad2)" "Net-(D9-Pad1)" "Net-(D10-Pad2)" "Net-(D10-Pad1)" "Net-(D11-Pad2)" "Net-(D11-Pad1)" "Net-(D12-Pad2)" "Net-(D12-Pad1)"
-    "Net-(D13-Pad2)" "Net-(D13-Pad1)" "Net-(D14-Pad2)" "Net-(D14-Pad1)" CW0 "Net-(D15-Pad1)" CW1 "Net-(D16-Pad1)"
-    CW2 "Net-(D17-Pad1)" CW3 "Net-(D18-Pad1)" CW4 "Net-(D19-Pad1)" CW5 "Net-(D20-Pad1)"
-    CW6 "Net-(D21-Pad1)" CW7 "Net-(D22-Pad1)" CW8 "Net-(D23-Pad1)" CW9 "Net-(D24-Pad1)"
-    CW10 "Net-(D25-Pad1)" CW11 "Net-(D26-Pad1)" CW12 "Net-(D27-Pad1)" CW13 "Net-(D28-Pad1)"
-    CW14 "Net-(D29-Pad1)" CW15 "Net-(D30-Pad1)" BUS0 "Net-(D31-Pad1)" BUS1 "Net-(D32-Pad1)"
-    BUS2 "Net-(D33-Pad1)" BUS3 "Net-(D34-Pad1)" BUS4 "Net-(D35-Pad1)" BUS5 "Net-(D36-Pad1)"
-    BUS6 "Net-(D37-Pad1)" BUS7 "Net-(D38-Pad1)" "Net-(J1-Pad5)" GND "Net-(J1-Pad3)" "Net-(J1-Pad2)"
-    VCC "TOP_SIG_OUT_2" "TOP_SIG_OUT_1" "TOP_SIG_OUT_0" "TOP_SIG_IN_2" "TOP_SIG_IN_1" "TOP_SIG_IN_0" CLOCK
-    RESET "BOTTOM_SIG_IN_0" "BOTTOM_SIG_IN_1" "BOTTOM_SIG_IN_2" "BOTTOM_SIG_OUT_0" "BOTTOM_SIG_OUT_1" "BOTTOM_SIG_OUT_2" "Net-(RN1-Pad3)"
-    "Net-(U1-Pad15)" ~CLOCK "Net-(U2-Pad6)" "Net-(U2-Pad5)" "IR_IN" ~RESET ~CWZ "Net-(U10-Pad4)"
-    "Net-(U10-Pad2)" "Net-(U10-Pad3)" "Net-(U10-Pad1)" "Net-(U10-Pad12)" "Net-(U10-Pad6)" "Net-(U10-Pad11)" "Net-(U10-Pad5)" "~FR_IN"
-    "Net-(U6-Pad12)" "Net-(U6-Pad11)" ~CW4 ~CW0 "GND_1k" "Net-(U7-Pad12)" "MI_CLOCK"
+    "Net-(D1-A)" "Net-(D1-K)" "Net-(D2-A)" "Net-(D2-K)" "Net-(D3-A)" "Net-(D3-K)" "Net-(D4-A)" "Net-(D4-K)"
+    "Net-(D5-A)" "Net-(D5-K)" "Net-(D6-A)" "Net-(D6-K)" INST7 "Net-(D7-K)" INST6 "Net-(D8-K)"
+    INST5 "Net-(D9-K)" INST4 "Net-(D10-K)" CW0 INST3 CW1 "Net-(D11-K)"
+    CW2 INST2 CW3 "Net-(D12-K)" CW4 INST1 CW5 "Net-(D13-K)"
+    CW6 INST0 CW7 "Net-(D14-K)" CW8 "Net-(D15-K)" CW9 "Net-(D16-K)"
+    CW10 "Net-(D17-K)" CW11 "Net-(D18-K)" CW12 "Net-(D19-K)" CW13 "Net-(D20-K)"
+    CW14 "Net-(D21-K)" CW15 "Net-(D22-K)" BUS0 "Net-(D23-K)" BUS1 "Net-(D24-K)"
+    BUS2 "Net-(D25-K)" BUS3 "Net-(D26-K)" BUS4 "Net-(D27-K)" BUS5 "Net-(D28-K)"
+    BUS6 "Net-(D29-K)" BUS7 "Net-(D30-K)" "Net-(D31-K)" "Net-(D32-K)" "Net-(D33-K)" "TOP_SIG_OUT_2"
+    "TOP_SIG_OUT_1" "TOP_SIG_OUT_0" "TOP_SIG_IN_2" "TOP_SIG_IN_1" "TOP_SIG_IN_0" CLOCK RESET "BOTTOM_SIG_IN_0"
+    "BOTTOM_SIG_IN_1" "BOTTOM_SIG_IN_2" "BOTTOM_SIG_OUT_0" "BOTTOM_SIG_OUT_1" "BOTTOM_SIG_OUT_2" "Net-(D34-K)" "Net-(D35-K)" ~{CLOCK}
+    "Net-(D36-K)" "Net-(D37-K)" ~{RESET} "Net-(D38-K)" "Net-(U10-Pad12)" "Net-(U10-Pad6)" "Net-(U10-Pad11)" "Net-(U10-Pad5)"
+    "~{FR_IN}" "Net-(U6-Pad12)" "Net-(U6-Pad11)" ~{CW4} ~{CW0} "GND_1k" "MI_CLOCK" ~{CW14}
+    "Net-(J1-CC1)" "Net-(J1-CC2)" "unconnected-(RN1-R2-Pad3)" "unconnected-(U1-TC-Pad15)" "unconnected-(U2-Q2-Pad5)" "unconnected-(U2-Q3-Pad6)" "unconnected-(U6-Pad6)"
     (clearance_class "kicad_default")
-    (via_rule kicad_default)
+    (via_rule "kicad_default")
     (rule
       (width 250.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class Power
+    GND VCC
+    (clearance_class Power)
+    (via_rule Power)
+    (rule
+      (width 600.0)
     )
     (circuit 
       (use_layer F.Cu B.Cu)

@@ -1,3 +1,4 @@
 (sym_lib_table
-  (lib (name Bus-rescue)(type Legacy)(uri ${KIPRJMOD}/Bus-rescue.lib)(options "")(descr ""))
+  (version 7)
+  (lib (name "Bus-rescue")(type "KiCad")(uri "${KIPRJMOD}/Bus-rescue.kicad_sym")(options "")(descr ""))
 )

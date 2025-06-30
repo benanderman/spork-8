@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "Input-rescue")(type "KiCad")(uri "${KIPRJMOD}/Input-rescue.kicad_sym")(options "")(descr ""))
+)

@@ -1001,37 +1001,37 @@ F 3 "~" V 3300 6650 50  0001 C CNN
 	1    3300 6650
 	0    -1   -1   0   
 $EndComp
-Text GLabel 1050 6450 1    50   Input ~ 0
-A0
-Text GLabel 1200 6450 1    50   Input ~ 0
-A1
-Text GLabel 1350 6450 1    50   Input ~ 0
-A2
-Text GLabel 1500 6450 1    50   Input ~ 0
-A3
-Text GLabel 1650 6450 1    50   Input ~ 0
-A4
-Text GLabel 1800 6450 1    50   Input ~ 0
-A5
-Text GLabel 1950 6450 1    50   Input ~ 0
-A6
-Text GLabel 2100 6450 1    50   Input ~ 0
-A7
-Text GLabel 2250 6450 1    50   Input ~ 0
-A8
-Text GLabel 2400 6450 1    50   Input ~ 0
-A9
-Text GLabel 2550 6450 1    50   Input ~ 0
-A10
-Text GLabel 2700 6450 1    50   Input ~ 0
-A11
-Text GLabel 2850 6450 1    50   Input ~ 0
-A12
-Text GLabel 3000 6450 1    50   Input ~ 0
-A13
-Text GLabel 3150 6450 1    50   Input ~ 0
-A14
 Text GLabel 3300 6450 1    50   Input ~ 0
+A0
+Text GLabel 3150 6450 1    50   Input ~ 0
+A1
+Text GLabel 3000 6450 1    50   Input ~ 0
+A2
+Text GLabel 2850 6450 1    50   Input ~ 0
+A3
+Text GLabel 2700 6450 1    50   Input ~ 0
+A4
+Text GLabel 2550 6450 1    50   Input ~ 0
+A5
+Text GLabel 2400 6450 1    50   Input ~ 0
+A6
+Text GLabel 2250 6450 1    50   Input ~ 0
+A7
+Text GLabel 2100 6450 1    50   Input ~ 0
+A8
+Text GLabel 1950 6450 1    50   Input ~ 0
+A9
+Text GLabel 1800 6450 1    50   Input ~ 0
+A10
+Text GLabel 1650 6450 1    50   Input ~ 0
+A11
+Text GLabel 1500 6450 1    50   Input ~ 0
+A12
+Text GLabel 1350 6450 1    50   Input ~ 0
+A13
+Text GLabel 1200 6450 1    50   Input ~ 0
+A14
+Text GLabel 1050 6450 1    50   Input ~ 0
 A15
 Wire Wire Line
 	1050 6450 1050 6550

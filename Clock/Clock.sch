@@ -218,8 +218,8 @@ L Device:R_POT_TRIM_US RV1
 U 1 1 5FAE211D
 P 7100 1600
 F 0 "RV1" H 7032 1554 50  0000 R CNN
-F 1 "100k" H 7032 1645 50  0000 R CNN
-F 2 "Potentiometer_THT:Potentiometer_Alps_RK09Y11_Single_Horizontal" H 7100 1600 50  0001 C CNN
+F 1 "1M" H 7032 1645 50  0000 R CNN
+F 2 "Potentiometer_THT:Potentiometer_Bourns_PTV09A-1_Single_Vertical" H 7100 1600 50  0001 C CNN
 F 3 "~" H 7100 1600 50  0001 C CNN
 	1    7100 1600
 	-1   0    0    1   

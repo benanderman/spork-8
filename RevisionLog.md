@@ -2,6 +2,34 @@
 
 This is to document all the issues (and fixes to them) of each revision of boards.
 
+## Revision 3 (re-build in progress)
+* **Clock**:
+  * Switched to a vertical potentiometer, to be more ergnomic. It's probably higher Ohms as well.
+* **ALU** fully works.
+* **Control Module**:
+  * Switched instruction register to use 2x 173 4-bit registers, rather than 1x 273 8-bit register, which allows removing a gate chip. The 4-bit registers support separate clock-pulse and enable signals, which solves the random loading issue in revision 2.
+  * Switched to using signal 14 for `reset micro-instruction counter`, since it was unused, and this enables getting rid of the only 30 chip (8-input AND).
+  * The net removal of 1 chip also fixes the issue of the crowding of U11/U12, and U6/U7.
+  * Switched to USB-C from USB-B.
+  * Remove pull-down resistors for control lines, since the outputs from the EEPROMs never float.
+  * Removed the inaccurate line over the Zero flag on the silk screen.
+* **Counter** fully works.
+* **RAM / ROM**:
+  * Added a cartridge slot, using the most significant bit of the address to select between the cartridge and on-board EEPROM.
+* **General fixes and improvements**:
+  * Binary display on all boards is corrected.
+  * Switched to HC chips, which should use much less power.
+  * Added screw holes to all boards to be able to mount it.
+* **New boards**:
+  * IO module: replaces Input, to have output and input next to each other. The trade-off is that for inputting, it doesn't hold the input value in a register, it just directly connects it to the bus, and for outputting, the outputted value (which is stored in a register) is write-only (it can't be copied back out). But it makes it much more convenient to interface with a shift register.
+  * Battery module: holds a battery, can charge it, and has a switch to output power to the CPU. Plugs into the non-addressable module slot on the bottom bus boards.
+  * Controller Connector peripheral board: plugs into IO module, and has two RJ12 plugs on it, to connect to parallel-to-serial shift register-based controllers.
+  * Screen peripheral board: 10x20 595-shift register-based monochrome display. Plugs into output module (vertically), or IO module (horizontally).
+  * Programming board: Arduino-based board used to program and test the CPU in 3 ways:
+    1. Separate from the CPU, read / write to EEPROMs (big ones, or cartridges).
+    2. Plug into bus boards, to test all the modules plugged in.
+    3. Replace the program memory and clock, to have a very fast development cycle to write program code.
+
 ## Revision 2
 
 * **RAM / ROM** fully works.
