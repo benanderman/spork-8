@@ -1,0 +1,10 @@
+Designator,Val,Package,Mid X,Mid Y,Rotation,Layer
+J1,Conn_01x14,PinHeader_1x14_P2.54mm_Vertical,111.76,-54.356,180,bottom
+J2,Conn_01x14,PinHeader_1x14_P2.54mm_Vertical,56.896,-54.356,180,bottom
+D1,LED,LED_0402_1005Metric,80.414,-88.265,180,top
+D2,LED,LED_0402_1005Metric,105.814,-88.265,180,top
+J3,Conn_02x14_Top_Bottom,PinSocket_2x14_P2.54mm_Vertical,67.818,-61.595,90,top
+J4,RJE0166001,Connfly_RJ12_DS1133-S60BPX,71.724,-82.699,0,top
+J5,RJE0166001,Connfly_RJ12_DS1133-S60BPX,97.124,-82.699,0,top
+R1,10k,R_0402_1005Metric,80.439,-87.249,180,top
+R2,10k,R_0402_1005Metric,105.789,-87.249,180,top

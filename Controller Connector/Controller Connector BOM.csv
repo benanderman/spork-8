@@ -1,0 +1,6 @@
+Designator,Comment,Footprint,LCSC Part Number
+"D1, D2",LED,LED_0402_1005Metric,C965793
+"J1, J2",Conn_01x14,Connector_Generic:Conn_01x14,
+J3,Conn_02x14_Top_Bottom,Connector_Generic:Conn_02x14_Odd_Even,
+"J4, J5",RJE0166001,RJE0166001-RJE0166001,C77859
+"R1, R2",10k,R_0402_1005Metric,C25744
