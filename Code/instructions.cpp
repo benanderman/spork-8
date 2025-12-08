@@ -2,32 +2,51 @@
 
 #include "signals.h"
 
+// #undef uint8_t
+// #undef uint16_t
+// #undef bool
+// #include <iostream>
+
 #define ARRAY_LEN(arr) (sizeof(arr) / sizeof(*arr))
 
-Instruction::Instruction(Type type, byte flags_mask, byte data_bytes, uint16_t arg1, uint16_t arg2, uint16_t arg3) :
+#ifndef PROGMEM
+#define PROGMEM 
+#endif
+
+#ifndef pgm_read_word
+#define pgm_read_word(arg) (*arg)
+#endif
+
+Instruction::Instruction(Type type, uint8_t flags_mask, uint8_t data_bytes, uint8_t arg1, uint8_t arg2, uint8_t arg3) :
   type(type), data_bytes(data_bytes), flags_mask(flags_mask), arg1(arg1), arg2(arg2), arg3(arg3) {
   
 }
 
-uint16_t Instruction::microCodeForCycleFlags(byte cycle, byte flags) const {
+uint16_t Instruction::microCodeForCycleFlags(uint8_t cycle, uint8_t flags) const {
   static const uint16_t base_microcode[] = {
     OUT(PMEM) | INST_IN,
     PCNT_COUNT
   };
-  static const byte base_len = sizeof(base_microcode) / sizeof(*base_microcode);
+  static const uint8_t base_len = sizeof(base_microcode) / sizeof(*base_microcode);
 
   if (cycle < base_len) {
     if (type == Instruction::Type::Halt && cycle == 1) {
-      return 0; // For halt, we want to not advance the program counter, so it's run over and over forever
+      // printf("Returning halt\n");
+      return 0 | MI_RESET | INST_IN; // For halt, we want to not advance the program counter, so it's run over and over forever
     }
-    return base_microcode[cycle];
+    // printf("Returning base inst %d\n", cycle);
+    return base_microcode[cycle] ^ INST_IN;
   }
+
+  uint16_t result = 0;
   if (flags & flags_mask) { // The instruction is active in these flag conditions
-    return getMicrocode(cycle - base_len);
+    result = getMicrocode(cycle - base_len);
+    // printf("Returning microcode %d for type %d\n", cycle - base_len, (int)type);
   } else if (cycle - base_len < data_bytes) { // Skip past the data of the instruction if inactive
-    return PCNT_COUNT; 
+    // printf("Returning non-applying microcode for %d\n", (int)type);
+    result = PCNT_COUNT;
   }
-  return 0;
+  return (result == 0 ? MI_RESET : result) ^ INST_IN;
 }
 
 #define MC_START(inst) case Instruction::Type::inst: { uint16_t mi[] = {
@@ -37,16 +56,16 @@ uint16_t Instruction::microCodeForCycleFlags(byte cycle, byte flags) const {
 #define MC_START_PM(inst) case Instruction::Type::inst: { static const uint16_t mi_pm[] PROGMEM = {
 #define MC_END_PM }; return cycle < ARRAY_LEN(mi_pm) ? pgm_read_word(&mi_pm[cycle]) : 0; }
 
-uint16_t Instruction::getMicrocode(byte cycle) const {
+uint16_t Instruction::getMicrocode(uint8_t cycle) const {
   switch (type) {
     MC_START(SetPageReg)
-      OUT(arg1) | IN(MADR) | MADR_BSELECT
+      static_cast<uint16_t>((arg1) | IN(MADR) | MADR_BSELECT)
     MC_END
     MC_START_PM(SetPageI)
       OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT
     MC_END_PM
     MC_START(SetAddrReg)
-      OUT(arg1) | IN(MADR)
+      static_cast<uint16_t>((arg1) | IN(MADR))
     MC_END
     MC_START_PM(SetAddrI)
       OUT(PMEM) | IN(MADR) | PCNT_COUNT
@@ -55,29 +74,29 @@ uint16_t Instruction::getMicrocode(byte cycle) const {
     MC_START(Load)
       OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT,
       OUT(PMEM) | IN(MADR) | PCNT_COUNT,
-      OUT(SRAM) | IN(arg1)
+      static_cast<uint16_t>(OUT(SRAM) | IN(arg1))
     MC_END
     MC_START(LoadI)
-      OUT(PMEM) | IN(arg1) | PCNT_COUNT
+      static_cast<uint16_t>(OUT(PMEM) | IN(arg1) | PCNT_COUNT)
     MC_END
     MC_START(LoadZP)
       IN(MADR) | MADR_BSELECT,
       OUT(PMEM) | IN(MADR) | PCNT_COUNT,
-      OUT(SRAM) | IN(arg1)
+      static_cast<uint16_t>(OUT(SRAM) | IN(arg1))
     MC_END
     MC_START(LoadP)
       OUT(PMEM) | IN(MADR) | PCNT_COUNT,
-      OUT(SRAM) | IN(arg1)
+      static_cast<uint16_t>(OUT(SRAM) | IN(arg1))
     MC_END
     MC_START(LoadInc)
-      OUT(SRAM) | IN(arg1),
-      arg2 > 0 ? uint16_t(MADR_COUNT) : 0
+      static_cast<uint16_t>(OUT(SRAM) | IN(arg1)),
+      static_cast<uint16_t>(arg2 > 0 ? (uint16_t)(MADR_COUNT) : 0)
     MC_END
 
     MC_START(Store)
       OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT,
       OUT(PMEM) | IN(MADR) | PCNT_COUNT,
-      OUT(arg1) | IN(SRAM)
+      static_cast<uint16_t>(OUT(arg1) | IN(SRAM))
     MC_END
     MC_START_PM(StoreI)
       OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT,
@@ -87,15 +106,15 @@ uint16_t Instruction::getMicrocode(byte cycle) const {
     MC_START(StoreZP)
       IN(MADR) | MADR_BSELECT,
       OUT(PMEM) | IN(MADR) | PCNT_COUNT,
-      OUT(arg1) | IN(SRAM)
+      static_cast<uint16_t>(OUT(arg1) | IN(SRAM))
     MC_END
     MC_START(StoreP)
       OUT(PMEM) | IN(MADR) | PCNT_COUNT,
-      OUT(arg1) | IN(SRAM)
+      static_cast<uint16_t>(OUT(arg1) | IN(SRAM))
     MC_END
     MC_START(StoreInc)
-      OUT(arg1) | IN(SRAM),
-      arg2 > 0 ? uint16_t(MADR_COUNT) : 0
+      static_cast<uint16_t>(OUT(arg1) | IN(SRAM)),
+      static_cast<uint16_t>(arg2 > 0 ? (uint16_t)(MADR_COUNT) : 0)
     MC_END
     
     MC_START(Read)
@@ -103,7 +122,7 @@ uint16_t Instruction::getMicrocode(byte cycle) const {
     MC_END
     
     MC_START(Copy)
-      OUT(arg1) | IN(arg2) | arg3
+      static_cast<uint16_t>(OUT(arg1) | IN(arg2) | arg3)
     MC_END
 
     MC_START_PM(Jump)
@@ -112,10 +131,8 @@ uint16_t Instruction::getMicrocode(byte cycle) const {
       OUT(SWAP) | IN(PCNT) + PCNT_BSELECT
     MC_END_PM
 
-    MC_START_PM(Call)
-      IN(MADR),                                             // Start at 0
-      MADR_COUNT,                                           // Count to 1
-      OUT(MADR)  | IN(SWAP),                                // Copy 1 to SWAP
+    MC_START_PM(Call) // Assumes a constant 1 after the instruction in PMEM
+      OUT(PMEM)  | IN(SWAP)  | PCNT_COUNT,                  // Copy 1 to SWAP
       OUT(SWAP)  | IN(MADR)  | MADR_BSELECT,                // Go to the stack at (high byte) 0x01
       OUT(STCK)  | IN(MADR),                                // Go to location within stack
       MADR_COUNT | OUT(SWAP) | IN(MADR)     | MADR_BSELECT, // Go to stack + 1, and write 0x01 to high byte to prevent overflow
@@ -128,10 +145,9 @@ uint16_t Instruction::getMicrocode(byte cycle) const {
       OUT(PMEM)  | IN(PCNT),
       OUT(SWAP)  | IN(PCNT)  | PCNT_BSELECT
     MC_END_PM
-    MC_START_PM(Return)
-      IN(MADR),                                       // Start at 0
-      OUT(STCK)  | IN(REGA) | MADR_COUNT,             // Copy stack to register A, and count to 1
-      OUT(MADR)  | IN(REGB),                          // Copy 1 to register B
+    MC_START_PM(Return) // Assumes a constant 1 after the instruction in PMEM
+      OUT(STCK)  | IN(REGA),                          // Copy stack to register A
+      OUT(PMEM)  | IN(REGB) | PCNT_COUNT,             // Copy 1 to register B
       OUT(REGB)  | IN(MADR) | MADR_BSELECT,           // Go to stack, at high byte 0x01
       OUT(ALU)   | IN(MADR) | ALU_SUB,                // Go to stack - 1
       OUT(SRAM)  | IN(PCNT) | PCNT_BSELECT,           // Copy more significant byte to instruction counter
@@ -140,27 +156,23 @@ uint16_t Instruction::getMicrocode(byte cycle) const {
       OUT(ALU)   | IN(REGA) | ALU_SUB | PCNT_COUNT,   // Copy stack - 1 to A, to get stack - 2; skip past data byte 1 of Call*
       OUT(ALU)   | IN(STCK) | ALU_SUB | PCNT_COUNT    // Copy stack - 2 back to stack pointer after decrements (2 bytes were consumed); skip past data byte 2 of Call*
     MC_END_PM
-    MC_START(Push)
-      IN(MADR),                                             // Start at 0
-      MADR_COUNT,                                           // Count to 1
-      OUT(MADR)  | IN(SWAP),                                // Copy 1 to SWAP
+    MC_START(Push) // Assumes a constant 1 after the instruction in PMEM
+      OUT(PMEM)  | IN(SWAP)  | PCNT_COUNT,                  // Copy 1 to SWAP
       OUT(SWAP)  | IN(MADR)  | MADR_BSELECT,                // Go to the stack at (high byte) 0x01
       OUT(STCK)  | IN(MADR),                                // Go to location within stack
       MADR_COUNT | OUT(SWAP) | IN(MADR)     | MADR_BSELECT, // Go to stack + 1, and write 0x01 to high byte to prevent overflow
-      OUT(arg1)  | IN(SRAM),                                // Write register to stack
+      static_cast<uint16_t>(OUT(arg1)  | IN(SRAM)),         // Write register to stack
       OUT(MADR)  | IN(STCK)                                 // Write new stack pointer back to STCK
     MC_END
-    MC_START(Pop)
-      IN(MADR),                             // Start at 0
-      OUT(STCK)  | IN(REGA) | MADR_COUNT,   // Copy stack to register A, and count to 1
-      OUT(MADR)  | IN(REGB),                // Copy 1 to register B
-      OUT(REGB)  | IN(MADR) | MADR_BSELECT, // Go to stack, at high byte 0x01
-      OUT(STCK)  | IN(MADR),                // Go to stack pointer
-      OUT(SRAM)  | IN(arg1),                // Copy value to register
-      OUT(ALU)   | IN(STCK) | ALU_SUB       // Copy stack - 1 back to stack pointer
+    MC_START(Pop) // Assumes a constant 1 after the instruction in PMEM
+      OUT(STCK)  | IN(REGA),                         // Copy stack to register A
+      OUT(PMEM)  | IN(REGB) | PCNT_COUNT,            // Copy 1 to register B
+      OUT(REGB)  | IN(MADR) | MADR_BSELECT,          // Go to stack, at high byte 0x01
+      OUT(STCK)  | IN(MADR),                         // Go to stack pointer
+      static_cast<uint16_t>(OUT(SRAM)  | IN(arg1)),  // Copy value to register
+      OUT(ALU)   | IN(STCK) | ALU_SUB                // Copy stack - 1 back to stack pointer
     MC_END
-    MC_START_PM(PushAll)
-      IN(MADR),                                             // Start at 0
+    MC_START_PM(PushAll) // Assumes a constant 1 after the instruction in PMEM
       MADR_COUNT,                                           // Count to 1
       OUT(MADR)  | IN(SWAP),                                // Copy 1 to SWAP
       OUT(SWAP)  | IN(MADR)  | MADR_BSELECT,                // Go to the stack at (high byte) 0x01
@@ -173,8 +185,7 @@ uint16_t Instruction::getMicrocode(byte cycle) const {
       OUT(REGC)  | IN(SRAM),                                // Write register C to stack
       OUT(MADR)  | IN(STCK)                                 // Write new stack pointer back to STCK
     MC_END_PM
-    MC_START_PM(PopAll)
-      IN(MADR),                                             // Start at 0
+    MC_START_PM(PopAll) // Assumes a constant 1 after the instruction in PMEM
       OUT(STCK)  | IN(REGA) | MADR_COUNT,                   // Copy stack to register A, and count to 1
       OUT(MADR)  | IN(REGB),                                // Copy 1 to register B
       OUT(MADR)  | IN(SWAP),                                // Copy 1 to swap
@@ -210,44 +221,64 @@ uint16_t Instruction::getMicrocode(byte cycle) const {
       IN(ALU)   | OUT(ALU) | ALU_AND                    // Update flags
     MC_END_PM
     MC_START(CmpReg)
-      OUT(arg1)  | IN(REGB),
+      static_cast<uint16_t>(OUT(arg1)  | IN(REGB)),
       IN(ALU)    | OUT(ALU) | ALU_SUB    // Update flags
     MC_END
     MC_START(CmpAndReg)
-      OUT(arg1)  | IN(REGB),
+      static_cast<uint16_t>(OUT(arg1)  | IN(REGB)),
       IN(ALU)    | OUT(ALU) | ALU_AND    // Update flags
     MC_END
     MC_START(Mult)
-      arg1 > 0 ? OUT(REGA)  | IN(REGB) : IN(REGA), // Multiply by 0 = 0
-      arg1 > 0 ? OUT(ALU)   | IN(REGA) : 0,
-      arg1 > 1 ? OUT(ALU)   | IN(REGA) : 0,
-      arg1 > 2 ? OUT(ALU)   | IN(REGA) : 0,
-      arg1 > 3 ? OUT(ALU)   | IN(REGA) : 0,
-      arg1 > 4 ? OUT(ALU)   | IN(REGA) : 0,
-      arg1 > 5 ? OUT(ALU)   | IN(REGA) : 0,
-      arg1 > 6 ? OUT(ALU)   | IN(REGA) : 0,
-      arg1 > 7 ? OUT(ALU)   | IN(REGA) : 0,
-      arg1 > 8 ? OUT(ALU)   | IN(REGA) : 0,
-      arg1 > 9 ? OUT(ALU)   | IN(REGA) : 0,
-      arg1 > 10 ? OUT(ALU)  | IN(REGA) : 0,
-      arg1 > 11 ? OUT(ALU)  | IN(REGA) : 0,
-      arg1 > 12 ? OUT(ALU)  | IN(REGA) : 0
+      static_cast<uint16_t>(arg1 > 0 ? OUT(REGA)  | IN(REGB) : IN(REGA)), // Multiply by 0 = 0
+      static_cast<uint16_t>(arg1 > 0 ? OUT(ALU)   | IN(REGA) : 0),
+      static_cast<uint16_t>(arg1 > 1 ? OUT(ALU)   | IN(REGA) : 0),
+      static_cast<uint16_t>(arg1 > 2 ? OUT(ALU)   | IN(REGA) : 0),
+      static_cast<uint16_t>(arg1 > 3 ? OUT(ALU)   | IN(REGA) : 0),
+      static_cast<uint16_t>(arg1 > 4 ? OUT(ALU)   | IN(REGA) : 0),
+      static_cast<uint16_t>(arg1 > 5 ? OUT(ALU)   | IN(REGA) : 0),
+      static_cast<uint16_t>(arg1 > 6 ? OUT(ALU)   | IN(REGA) : 0),
+      static_cast<uint16_t>(arg1 > 7 ? OUT(ALU)   | IN(REGA) : 0),
+      static_cast<uint16_t>(arg1 > 8 ? OUT(ALU)   | IN(REGA) : 0),
+      static_cast<uint16_t>(arg1 > 9 ? OUT(ALU)   | IN(REGA) : 0),
+      static_cast<uint16_t>(arg1 > 10 ? OUT(ALU)  | IN(REGA) : 0),
+      static_cast<uint16_t>(arg1 > 11 ? OUT(ALU)  | IN(REGA) : 0),
+      static_cast<uint16_t>(arg1 > 12 ? OUT(ALU)  | IN(REGA) : 0)
     MC_END
     MC_START(ShiftL)
-      arg1 > 0 ? OUT(REGA)  | IN(REGB) : 0,
-      arg1 > 0 ? OUT(ALU)   | IN(REGA) : 0,
-      arg1 > 1 ? OUT(REGA)  | IN(REGB) : 0,
-      arg1 > 1 ? OUT(ALU)   | IN(REGA) : 0,
-      arg1 > 2 ? OUT(REGA)  | IN(REGB) : 0,
-      arg1 > 2 ? OUT(ALU)   | IN(REGA) : 0,
-      arg1 > 3 ? OUT(REGA)  | IN(REGB) : 0,
-      arg1 > 3 ? OUT(ALU)   | IN(REGA) : 0,
-      arg1 > 4 ? OUT(REGA)  | IN(REGB) : 0,
-      arg1 > 4 ? OUT(ALU)   | IN(REGA) : 0,
-      arg1 > 5 ? OUT(REGA)  | IN(REGB) : 0,
-      arg1 > 5 ? OUT(ALU)   | IN(REGA) : 0,
-      arg1 > 6 ? OUT(REGA)  | IN(REGB) : 0,
-      arg1 > 6 ? OUT(ALU)   | IN(REGA) : 0
+      static_cast<uint16_t>(arg1 > 0 ? OUT(SHFT)  | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 1 ? OUT(SHFT)  | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 2 ? OUT(SHFT)  | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 3 ? OUT(SHFT)  | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 4 ? OUT(SHFT)  | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 5 ? OUT(SHFT)  | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 6 ? OUT(SHFT)  | IN(REGB) : 0)
+    MC_END
+    MC_START(ShiftR)
+      static_cast<uint16_t>(arg1 > 0 ? OUT(SHFT)  | SHIFT_RIGHT  | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 1 ? OUT(SHFT)  | SHIFT_RIGHT  | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 2 ? OUT(SHFT)  | SHIFT_RIGHT  | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 3 ? OUT(SHFT)  | SHIFT_RIGHT  | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 4 ? OUT(SHFT)  | SHIFT_RIGHT  | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 5 ? OUT(SHFT)  | SHIFT_RIGHT  | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 6 ? OUT(SHFT)  | SHIFT_RIGHT  | IN(REGB) : 0)
+    MC_END
+    MC_START(RotateL)
+      static_cast<uint16_t>(arg1 > 0 ? OUT(SHFT)  | SHIFT_ROTATE | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 1 ? OUT(SHFT)  | SHIFT_ROTATE | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 2 ? OUT(SHFT)  | SHIFT_ROTATE | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 3 ? OUT(SHFT)  | SHIFT_ROTATE | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 4 ? OUT(SHFT)  | SHIFT_ROTATE | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 5 ? OUT(SHFT)  | SHIFT_ROTATE | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 6 ? OUT(SHFT)  | SHIFT_ROTATE | IN(REGB) : 0)
+    MC_END
+    MC_START(RotateR)
+      static_cast<uint16_t>(arg1 > 0 ? OUT(SHFT)  | SHIFT_ROTATE | SHIFT_RIGHT | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 1 ? OUT(SHFT)  | SHIFT_ROTATE | SHIFT_RIGHT | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 2 ? OUT(SHFT)  | SHIFT_ROTATE | SHIFT_RIGHT | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 3 ? OUT(SHFT)  | SHIFT_ROTATE | SHIFT_RIGHT | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 4 ? OUT(SHFT)  | SHIFT_ROTATE | SHIFT_RIGHT | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 5 ? OUT(SHFT)  | SHIFT_ROTATE | SHIFT_RIGHT | IN(REGB) : 0),
+      static_cast<uint16_t>(arg1 > 6 ? OUT(SHFT)  | SHIFT_ROTATE | SHIFT_RIGHT | IN(REGB) : 0)
     MC_END
     MC_START_PM(AddI)
       OUT(PMEM)  | IN(REGB) | PCNT_COUNT,
@@ -261,6 +292,18 @@ uint16_t Instruction::getMicrocode(byte cycle) const {
     MC_END_PM
     MC_START_PM(AndI)
       OUT(PMEM)  | IN(REGB) | PCNT_COUNT,
+      IN(ALU)    | OUT(ALU) | ALU_AND,    // Update flags
+      OUT(ALU)   | IN(REGA) | ALU_AND
+    MC_END_PM
+    MC_START_PM(AccumulateAdd)
+      IN(ALU)    | OUT(ALU),              // Update flags
+      OUT(ALU)   | IN(REGA)
+    MC_END_PM
+    MC_START_PM(AccumulateSub)
+      IN(ALU)    | OUT(ALU) | ALU_SUB,    // Update flags
+      OUT(ALU)   | IN(REGA) | ALU_SUB
+    MC_END_PM
+    MC_START_PM(AccumulateAnd)
       IN(ALU)    | OUT(ALU) | ALU_AND,    // Update flags
       OUT(ALU)   | IN(REGA) | ALU_AND
     MC_END_PM

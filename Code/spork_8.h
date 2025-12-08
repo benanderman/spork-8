@@ -8,23 +8,23 @@
 
 // Use -1 for pins that aren't connected
 struct Spork8Config {
-  byte memoryIndex;
-  byte counterIndex;
-  byte selfIndex; // An empty slot, for when we want to read or write without affecting anything else
+  uint8_t memoryIndex;
+  uint8_t counterIndex;
+  uint8_t selfIndex; // An empty slot, for when we want to read or write without affecting anything else
 
-  byte resetPin;
-  byte clockPin;
-  byte inIndexPins[3];
-  byte outIndexPins[3];
-  byte sharedSignalPins[4];
-  byte busPins[8];
+  uint8_t resetPin;
+  uint8_t clockPin;
+  uint8_t inIndexPins[3];
+  uint8_t outIndexPins[3];
+  uint8_t sharedSignalPins[4];
+  uint8_t busPins[8];
 };
 
 class Spork8 {
   public:
   
-  typedef void (*ReadCallback)(uint16_t address, byte value);
-  typedef byte (*WriteCallback)(uint16_t address);
+  typedef void (*ReadCallback)(uint16_t address, uint8_t value);
+  typedef uint8_t (*WriteCallback)(uint16_t address);
 
   Spork8Config conf;
   Spork8(const Spork8Config& conf) : conf(conf) {};
@@ -34,17 +34,17 @@ class Spork8 {
   void writeRange(uint16_t start, uint16_t len, WriteCallback callback, bool reverseBits = false);
   void readRange(uint16_t start, uint16_t len, ReadCallback callback, bool reverseBits = false);
 
-  void writeAddress(uint16_t address, byte value, bool reverseBits = false);
-  byte readAddress(uint16_t address, bool reverseBits = false);
+  void writeAddress(uint16_t address, uint8_t value, bool reverseBits = false);
+  uint8_t readAddress(uint16_t address, bool reverseBits = false);
   
   private:
   void cycleClock();
   void reset();
-  void setInIndex(byte index);
-  void setOutIndex(byte index);
+  void setInIndex(uint8_t index);
+  void setOutIndex(uint8_t index);
   void setCounterValue(uint16_t value);
-  void setBus(byte value, bool reverseBits = false);
-  byte readBus(bool reverseBits);
+  void setBus(uint8_t value, bool reverseBits = false);
+  uint8_t readBus(bool reverseBits);
   void setBusMode(int mode);
   void setCounterModes(bool countEnable, bool byteSelect);
 };

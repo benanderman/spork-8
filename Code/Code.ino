@@ -2,18 +2,19 @@
 #include "instruction_set.h"
 #include "programs.h"
 #include "spork_8.h"
+#include "programmer.h"
 #include "instructions.h"
 
 Spork8::WriteCallback verifyCallback = NULL;
 
 void setup() {
   Serial.begin(57600);
-//  disableSDP();
-  writeProgram();
-//  writeMicrocode(true);
-//  printMicrocode();
-//  printTestMicrocode();
 //  read256();
+//  writeMicrocode(false);
+//  writeMicrocode(true);
+//  disableSDP();
+ writeProgram();
+  // testBus();
 }
 
 void loop() {
@@ -39,59 +40,83 @@ Spork8 getNewSpork8() {
   return spork8;
 }
 
-void read256() {
-  Spork8 spork8 = getNewSpork8();
-  spork8.readRange(0, 1 << 15, printMemoryByte);
+Programmer getNewProgrammer() {
+  ProgrammerConfig conf = {
+    .busPins = {2, 3, 4, 5, 6, 7, 8, 9},
+    .weClockPin = 10,
+    .pauseButtonPin = 11,
+    .stepButtonPin = 12,
+    .continueButtonPin = 13,
+    .addrClockPin = 14,
+    .addrCountPin = 15,
+    .addrPE0Pin = 17,
+    .addrPE1Pin = 16,
+    .eepromCEPin = 18,
+    .eepromOEPin = 19,
+  };
+
+  Programmer programmer = Programmer(conf);
+  programmer.setPinModes();
+  return programmer;
 }
 
-// May or may not work. Not sure whether reverseBits should be true or false.
+void testBus() {
+  Programmer programmer = getNewProgrammer();
+  programmer.setBusMode(OUTPUT);
+  programmer.setBus(0b00000001);
+  delay(1000);
+  programmer.setBus(0b00000010);
+  delay(1000);
+  programmer.setBus(0b00000100);
+  delay(1000);
+  programmer.setBus(0b00001000);
+  delay(1000);
+  programmer.setBus(0b00010000);
+  delay(1000);
+  programmer.setBus(0b00100000);
+  delay(1000);
+  programmer.setBus(0b01000000);
+  delay(1000);
+  programmer.setBus(0b10000000);
+  delay(1000);
+}
+
+void read256() {
+  Programmer programmer = getNewProgrammer();
+  programmer.readRange(0, 1 << 8, printMemoryByte);
+}
+
 void disableSDP() {
-  Spork8 spork8 = getNewSpork8();
-  delay(10);
-  spork8.writeAddress(0x5555, 0xAA, false);
-  delay(10);
-  spork8.writeAddress(0x2AAA, 0x55, false);
-  delay(10);
-  spork8.writeAddress(0x5555, 0x80, false);
-  delay(10);
-  spork8.writeAddress(0x5555, 0xAA, false);
-  delay(10);
-  spork8.writeAddress(0x2AAA, 0x55, false);
-  delay(10);
-  spork8.writeAddress(0x5555, 0x20, false);
-  delay(10);
+  Programmer programmer = getNewProgrammer();
+  programmer.writeAddress(0x5555, 0xAA, false);
+  programmer.writeAddress(0x2AAA, 0x55, false);
+  programmer.writeAddress(0x5555, 0x80, false);
+  programmer.writeAddress(0x5555, 0xAA, false);
+  programmer.writeAddress(0x2AAA, 0x55, false);
+  programmer.writeAddress(0x5555, 0x20, false);
 }
 
 void writeProgram() {
-  Spork8 spork8 = getNewSpork8();
+  Programmer programmer = getNewProgrammer();
 
   Serial.println("Writing program");
-  spork8.writeRange(0, 1 << 13, getSnakeByte, true);
+  programmer.writeRange(0, 1 << 10, getMovingDotByte, false);
   Serial.println("Reading");
-  verifyCallback = getSnakeByte;
-  spork8.readRange(0, 1 << 13, printAndVerifyByte, true);
+  verifyCallback = getMovingDotByte;
+  programmer.readRange(0, 1 << 10, printAndVerifyByte, false);
 }
 
 void writeMicrocode(bool highBytes) {
-  Spork8 spork8 = getNewSpork8();
-  Spork8::WriteCallback callback = highBytes ? getMicrocodeHighByte : getMicrocodeLowByte;
+  Programmer programmer = getNewProgrammer();
+  Programmer::WriteCallback callback = highBytes ? getMicrocodeHighByte : getMicrocodeLowByte;
   Serial.println("Writing microcode");
-  spork8.writeRange(0, 1 << 15, callback);
+  uint16_t start = 0; // 0x1780;
+  uint16_t end = 1 << 15; // 0x1A40;
+  programmer.writeRange(start, end - start, callback);
   Serial.println("Reading");
   verifyCallback = callback;
-  spork8.readRange(0, 1 << 15, printAndVerifyByte);
+  programmer.readRange(start, end - start, printAndVerifyByte);
 }
-
-//void printTestMicrocode() {
-//  Instruction inst = Instruction(Instruction::Type::PushAll,   Instruction::FlagsMask::UNCONDITIONAL, 0);
-//  Serial.print("\n");
-//  for (int f = 0; f < 4; f++) {
-//    for (int i = 0; i < 16; i++) {
-//      printMemoryByte(i, inst.microCodeForCycleFlags(i, 1 << f) >> 8);
-//    }
-//    Serial.print("\n");
-//  }
-//}
 
 void printMicrocode() {  
   for (int i = 0; i < 1 << 13; i++) {
@@ -107,6 +132,10 @@ void printMemoryByte(uint16_t address, byte value) {
   if (address != 0 && address % 64 == 0) {
     Serial.print('\n');
   }
+  if (address % 64 == 0) {
+    Serial.print(address, HEX);
+    Serial.print(": ");
+  }
   if (value < 16) {
     Serial.print('0'); // leading zero
   }
@@ -115,10 +144,14 @@ void printMemoryByte(uint16_t address, byte value) {
 
 void printAndVerifyByte(uint16_t address, byte value) {
 //  printMemoryByte(address, verifyCallback(address));
+  byte expectedValue = verifyCallback(address);
   printMemoryByte(address, value);
-  if (verifyCallback(address) != value) {
-    Serial.print("!");
-    Serial.print(verifyCallback(address), HEX);
-    Serial.print("!");
+  if (expectedValue != value) {
+    Serial.print("(");
+    if (expectedValue < 16) {
+      Serial.print('0'); // leading zero
+    }
+    Serial.print(expectedValue, HEX);
+    Serial.print(")");
   }
 }
