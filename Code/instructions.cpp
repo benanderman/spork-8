@@ -59,13 +59,13 @@ uint16_t Instruction::microCodeForCycleFlags(uint8_t cycle, uint8_t flags) const
 uint16_t Instruction::getMicrocode(uint8_t cycle) const {
   switch (type) {
     MC_START(SetPageReg)
-      static_cast<uint16_t>((arg1) | IN(MADR) | MADR_BSELECT)
+      static_cast<uint16_t>(OUT(arg1) | IN(MADR) | MADR_BSELECT)
     MC_END
     MC_START_PM(SetPageI)
       OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT
     MC_END_PM
     MC_START(SetAddrReg)
-      static_cast<uint16_t>((arg1) | IN(MADR))
+      static_cast<uint16_t>(OUT(arg1) | IN(MADR))
     MC_END
     MC_START_PM(SetAddrI)
       OUT(PMEM) | IN(MADR) | PCNT_COUNT
