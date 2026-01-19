@@ -225,6 +225,24 @@ Instruction getInstruction(uint8_t index) {
     Instruction(Instruction::Type::AndI,      Instruction::FlagsMask::CF | Instruction::FlagsMask::ZF_CF, 1),
     Instruction(Instruction::Type::AndI,      Instruction::FlagsMask::CF | Instruction::FlagsMask::NO_FLAGS, 1),
     Instruction(Instruction::Type::AndI,      Instruction::FlagsMask::ZF | Instruction::FlagsMask::NO_FLAGS, 1),
+
+    Instruction(Instruction::Type::AddINF,      Instruction::FlagsMask::UNCONDITIONAL, 1),
+    Instruction(Instruction::Type::AddINF,      Instruction::FlagsMask::ZF | Instruction::FlagsMask::ZF_CF, 1),
+    Instruction(Instruction::Type::AddINF,      Instruction::FlagsMask::CF | Instruction::FlagsMask::ZF_CF, 1),
+    Instruction(Instruction::Type::AddINF,      Instruction::FlagsMask::CF | Instruction::FlagsMask::NO_FLAGS, 1),
+    Instruction(Instruction::Type::AddINF,      Instruction::FlagsMask::ZF | Instruction::FlagsMask::NO_FLAGS, 1),
+
+    Instruction(Instruction::Type::SubINF,      Instruction::FlagsMask::UNCONDITIONAL, 1),
+    Instruction(Instruction::Type::SubINF,      Instruction::FlagsMask::ZF | Instruction::FlagsMask::ZF_CF, 1),
+    Instruction(Instruction::Type::SubINF,      Instruction::FlagsMask::CF | Instruction::FlagsMask::ZF_CF, 1),
+    Instruction(Instruction::Type::SubINF,      Instruction::FlagsMask::CF | Instruction::FlagsMask::NO_FLAGS, 1),
+    Instruction(Instruction::Type::SubINF,      Instruction::FlagsMask::ZF | Instruction::FlagsMask::NO_FLAGS, 1),
+
+    Instruction(Instruction::Type::AndINF,      Instruction::FlagsMask::UNCONDITIONAL, 1),
+    Instruction(Instruction::Type::AndINF,      Instruction::FlagsMask::ZF | Instruction::FlagsMask::ZF_CF, 1),
+    Instruction(Instruction::Type::AndINF,      Instruction::FlagsMask::CF | Instruction::FlagsMask::ZF_CF, 1),
+    Instruction(Instruction::Type::AndINF,      Instruction::FlagsMask::CF | Instruction::FlagsMask::NO_FLAGS, 1),
+    Instruction(Instruction::Type::AndINF,      Instruction::FlagsMask::ZF | Instruction::FlagsMask::NO_FLAGS, 1),
     
     Instruction(Instruction::Type::AccumulateAdd, Instruction::FlagsMask::UNCONDITIONAL, 0),
     Instruction(Instruction::Type::AccumulateSub, Instruction::FlagsMask::UNCONDITIONAL, 0),

@@ -25,7 +25,7 @@ Instruction::Instruction(Type type, uint8_t flags_mask, uint8_t data_bytes, uint
 uint16_t Instruction::microCodeForCycleFlags(uint8_t cycle, uint8_t flags) const {
   static const uint16_t base_microcode[] = {
     OUT(PMEM) | INST_IN,
-    PCNT_COUNT
+    PCNT_COUNT // Has to be its own micro-instruction, because INST_IN happens on ~CLOCK.
   };
   static const uint8_t base_len = sizeof(base_microcode) / sizeof(*base_microcode);
 
@@ -293,6 +293,18 @@ uint16_t Instruction::getMicrocode(uint8_t cycle) const {
     MC_START_PM(AndI)
       OUT(PMEM)  | IN(REGB) | PCNT_COUNT,
       IN(ALU)    | OUT(ALU) | ALU_AND,    // Update flags
+      OUT(ALU)   | IN(REGA) | ALU_AND
+    MC_END_PM
+    MC_START_PM(AddINF)
+      OUT(PMEM)  | IN(REGB) | PCNT_COUNT,
+      OUT(ALU)   | IN(REGA)
+    MC_END_PM
+    MC_START_PM(SubINF)
+      OUT(PMEM)  | IN(REGB) | PCNT_COUNT,
+      OUT(ALU)   | IN(REGA) | ALU_SUB
+    MC_END_PM
+    MC_START_PM(AndINF)
+      OUT(PMEM)  | IN(REGB) | PCNT_COUNT,
       OUT(ALU)   | IN(REGA) | ALU_AND
     MC_END_PM
     MC_START_PM(AccumulateAdd)

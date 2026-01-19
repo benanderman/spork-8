@@ -61,6 +61,9 @@ class Instruction {
     AddI,
     SubI,
     AndI,
+    AddINF, // No flags update.
+    SubINF, // No flags update.
+    AndINF, // No flags update.
     AccumulateAdd,
     AccumulateSub,
     AccumulateAnd,
