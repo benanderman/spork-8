@@ -24,23 +24,28 @@ struct ProgrammerConfig {
 class Programmer {
   public:
   
-  typedef void (*ReadCallback)(unsigned short address, uint8_t value);
+  typedef void (*ReadCallback)(signed short address, uint8_t value);
   typedef uint8_t (*WriteCallback)(unsigned short address);
 
   ProgrammerConfig conf;
   Programmer(const ProgrammerConfig& conf) : conf(conf) {};
 
-  void setPinModes();
+  void setPinModes(uint8_t cpuMode = false);
 
-  void writeRange(unsigned short start, unsigned short len, WriteCallback callback, bool reverseBits = false);
-  void readRange(unsigned short start, unsigned short len, ReadCallback callback, bool reverseBits = false);
+  void writeRange(unsigned short start, unsigned short len, WriteCallback callback, unsigned char reverseBits = false);
+  void readRange(unsigned short start, unsigned short len, ReadCallback callback, unsigned char reverseBits = false);
 
-  void writeAddress(unsigned short address, unsigned char value, bool reverseBits = false);
-  uint8_t readAddress(unsigned short address, bool reverseBits = false);
+  void writeAddress(unsigned short address, unsigned char value, unsigned char reverseBits = false);
+  uint8_t readAddress(unsigned short address, unsigned char reverseBits = false);
 
-  void setBus(uint8_t value, bool reverseBits = false);
-  uint8_t readBus(bool reverseBits);
+  void setBus(uint8_t value, uint8_t reverseBits = false);
+  uint8_t readBus(uint8_t reverseBits);
   void setBusMode(int mode);
+
+  void resetCPU();
+  void setCPUClock(uint8_t value);
+  bool getCPUSigIn();
+  bool getCPUSigOut();
   
   private:
   void setEEPROMEnabled(bool enabled);

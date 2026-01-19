@@ -1,6 +1,6 @@
 #include "programs.h"
 
-uint8_t getJumpToCartridgeByte(uint16_t address) {
+uint8_t getJumpToCartridgeByte(unsigned short address) {
   static const unsigned char PROGMEM data[] = {
     /* 0x00 */ 0x66, 0x80, 0x00
   };

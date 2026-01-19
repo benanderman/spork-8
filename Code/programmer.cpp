@@ -12,11 +12,12 @@ static const int pageWriteDelay = 11; // ms
 static const uint16_t pageMask = 0b1111111000000;
 static const int pageSize = 64;
 
-void Programmer::setPinModes() {
-  pinMode(conf.weClockPin, OUTPUT);
-  pinMode(conf.pauseButtonPin, INPUT_PULLUP);
-  pinMode(conf.stepButtonPin, INPUT_PULLUP);
-  pinMode(conf.continueButtonPin, INPUT_PULLUP);
+void Programmer::setPinModes(uint8_t cpuMode) {
+  // CPU SIG_OUT.
+  pinMode(conf.weClockPin, cpuMode ? INPUT : OUTPUT);
+  pinMode(conf.pauseButtonPin, INPUT);
+  pinMode(conf.stepButtonPin, INPUT);
+  pinMode(conf.continueButtonPin, INPUT);
   pinMode(conf.addrClockPin, OUTPUT);
   pinMode(conf.addrCountPin, OUTPUT);
   pinMode(conf.addrPE0Pin, OUTPUT);
@@ -26,15 +27,22 @@ void Programmer::setPinModes() {
 
   setBusMode(INPUT);
 
-  // These are all active low
-  digitalWrite(conf.weClockPin, HIGH);
-  digitalWrite(conf.addrPE0Pin, HIGH);
-  digitalWrite(conf.addrPE1Pin, HIGH);
-  digitalWrite(conf.eepromCEPin, HIGH);
-  digitalWrite(conf.eepromOEPin, LOW);
+  if (cpuMode) {
+    // CPU clock.
+    digitalWrite(conf.eepromCEPin, LOW);
+    // CPU reset.
+    digitalWrite(conf.eepromOEPin, LOW);
+  } else {
+    // These are all active low
+    digitalWrite(conf.weClockPin, HIGH);
+    digitalWrite(conf.addrPE0Pin, HIGH);
+    digitalWrite(conf.addrPE1Pin, HIGH);
+    digitalWrite(conf.eepromCEPin, HIGH);
+    digitalWrite(conf.eepromOEPin, LOW);
+  }
 }
 
-void Programmer::writeRange(unsigned short start, unsigned short len, WriteCallback callback, bool reverseBits) {
+void Programmer::writeRange(unsigned short start, unsigned short len, WriteCallback callback, unsigned char reverseBits) {
   setCounterValue(start);
   setEEPROMEnabled(true);
   setEEPROMOutput(false);
@@ -68,7 +76,7 @@ void Programmer::writeRange(unsigned short start, unsigned short len, WriteCallb
   setEEPROMEnabled(false);
 }
 
-void Programmer::readRange(unsigned short start, unsigned short len, ReadCallback callback, bool reverseBits) {
+void Programmer::readRange(unsigned short start, unsigned short len, ReadCallback callback, unsigned char reverseBits) {
   setCounterValue(start);
   setBusMode(INPUT);
   setEEPROMOutput(true);
@@ -83,7 +91,7 @@ void Programmer::readRange(unsigned short start, unsigned short len, ReadCallbac
   }
 }
 
-void Programmer::writeAddress(unsigned short address, unsigned char value, bool reverseBits) {
+void Programmer::writeAddress(unsigned short address, unsigned char value, unsigned char reverseBits) {
   setCounterValue(address);
   setEEPROMEnabled(true);
   setEEPROMOutput(false);
@@ -97,7 +105,7 @@ void Programmer::writeAddress(unsigned short address, unsigned char value, bool 
   setEEPROMEnabled(false);
 }
 
-uint8_t Programmer::readAddress(unsigned short address, bool reverseBits) {
+uint8_t Programmer::readAddress(unsigned short address, unsigned char reverseBits) {
   setBusMode(INPUT);
   setEEPROMOutput(true);
   setEEPROMEnabled(true);
@@ -122,7 +130,7 @@ void Programmer::setCounterValue(uint16_t value) {
   setBusMode(INPUT);
 }
 
-void Programmer::setBus(uint8_t value, bool reverseBits) {
+void Programmer::setBus(uint8_t value, uint8_t reverseBits) {
   PORTD = (PORTD & 0b00000011) | value << 2;
   PORTB = (PORTB & 0b11111100) | value >> 6;
   // for (int i = 0; i < 8; i++) {
@@ -131,7 +139,7 @@ void Programmer::setBus(uint8_t value, bool reverseBits) {
   // }
 }
 
-uint8_t Programmer::readBus(bool reverseBits) {
+uint8_t Programmer::readBus(uint8_t reverseBits) {
   uint8_t value;
   value = (PIND >> 2) | (PINB << 6);
   return value;
@@ -148,6 +156,30 @@ void Programmer::setBusMode(int mode) {
   // for (int i = 0; i < 8; i++) {
   //   pinMode(conf.busPins[i], mode);
   // }
+}
+
+void Programmer::resetCPU() {
+  // eepromOEPin is also the CPU reset pin.
+  digitalWrite(conf.eepromOEPin, HIGH);
+  digitalWrite(conf.eepromOEPin, LOW);
+
+  // eepromCEPin is also the CPU clock pin.
+  digitalWrite(conf.eepromCEPin, LOW);
+}
+
+void Programmer::setCPUClock(uint8_t value) {
+  // eepromCEPin is also the CPU clock pin.
+  digitalWrite(conf.eepromCEPin, value);
+}
+
+bool Programmer::getCPUSigIn() {
+  // pauseButtonPin is also the CPU sig in pin.
+  return digitalRead(conf.pauseButtonPin);
+}
+
+bool Programmer::getCPUSigOut() {
+  // weClockPin is also the CPU sig in pin.
+  return digitalRead(conf.weClockPin);
 }
 
 void Programmer::setEEPROMEnabled(bool enabled) {

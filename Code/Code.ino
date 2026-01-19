@@ -2,6 +2,7 @@
 #include "instruction_set.h"
 #include "programs.h"
 #include "spork_8.h"
+#include "spork_8_state.h"
 #include "programmer.h"
 #include "instructions.h"
 
@@ -13,8 +14,9 @@ void setup() {
 //  writeMicrocode(false);
 //  writeMicrocode(true);
 //  disableSDP();
- writeProgram();
-  // testBus();
+  writeProgram();
+//  testBus();
+//  emulate();
 }
 
 void loop() {
@@ -40,7 +42,7 @@ Spork8 getNewSpork8() {
   return spork8;
 }
 
-Programmer getNewProgrammer() {
+Programmer getNewProgrammer(bool cpuMode = false) {
   ProgrammerConfig conf = {
     .busPins = {2, 3, 4, 5, 6, 7, 8, 9},
     .weClockPin = 10,
@@ -56,7 +58,7 @@ Programmer getNewProgrammer() {
   };
 
   Programmer programmer = Programmer(conf);
-  programmer.setPinModes();
+  programmer.setPinModes(cpuMode);
   return programmer;
 }
 
@@ -79,6 +81,97 @@ void testBus() {
   delay(1000);
   programmer.setBus(0b10000000);
   delay(1000);
+}
+
+uint8_t emulatorGetProgmemByte(uint16_t address) {
+  uint8_t value = (address & 0x8000) ? getMovingDotByte(address ^ 0x8000) : getJumpToCartridgeByte(address);
+  return value;
+}
+
+uint8_t *emulator_memory = nullptr;
+uint16_t emulator_memory_size = 0;
+uint8_t emulator_ram_pages = 0;
+uint8_t emulator_ram_page_size = 0;
+uint8_t emulatorGetRamByte(uint16_t address) {
+  uint8_t page = address >> 8;
+  uint8_t addr = address & 0xFF;
+  if (page < emulator_ram_pages && addr < emulator_ram_page_size) {
+    return emulator_memory[page * emulator_ram_page_size];
+  } else {
+    return 0;
+  }
+}
+void emulatorSetRamByte(uint16_t address, uint8_t value) {
+  uint8_t page = address >> 8;
+  uint8_t addr = address & 0xFF;
+  if (page < emulator_ram_pages && addr < emulator_ram_page_size) {
+    emulator_memory[page * emulator_ram_page_size] = value;
+  }
+}
+
+void emulate() {
+  Programmer programmer = getNewProgrammer(true);
+  Serial.println("Emulator");
+
+  const uint8_t pages = 2;
+  const uint8_t page_size = 32;
+  uint8_t ram_buffer[pages * page_size];
+  emulator_memory = ram_buffer;
+  emulator_memory_size = sizeof(ram_buffer) / sizeof(*ram_buffer);
+  uint8_t emulator_ram_pages = pages;
+  uint8_t emulator_ram_page_size = page_size;
+
+  Spork8State state = Spork8State();
+  spork8_state_reset(&state);
+  state.get_progmem_byte = emulatorGetProgmemByte;
+  state.get_ram_byte = emulatorGetRamByte;
+  state.set_ram_byte = emulatorSetRamByte;
+  spork8_state_cycle(&state);
+
+  programmer.resetCPU();
+
+  while (true) {
+    // Get signal values.
+    bool sig_out = programmer.getCPUSigOut();
+
+    // TODO: Verify signal values are as expected.
+
+    // Set bus mode and value if output is enabled.
+    if (sig_out) {
+      programmer.setBusMode(OUTPUT);
+      programmer.setBus(state.bus);
+      Serial.print("Bus: ");
+      Serial.print(state.bus, HEX);
+      Serial.print(" (output)\n");
+
+    // Verify bus is as expected if not outputting to it.
+    } else {
+      programmer.setBusMode(INPUT);
+      uint8_t bus = programmer.readBus(false);
+      Serial.print("Bus: virtual ");
+      Serial.print(state.bus, HEX);
+      Serial.print(" real ");
+      Serial.print(bus, HEX);
+      Serial.print("\n");
+      // if (state.bus != bus) {
+      //   break;
+      // }
+    }
+
+    // Set clock to high to "do" the cycle, and cycle the state.
+    delay(500);
+    programmer.setCPUClock(HIGH);
+    delay(500);
+    spork8_state_cycle(&state);
+
+    // Set clock to low again. Don't delay here, because we want to change bus output
+    // mode ASAP after reading SIG_OUT, since this is when signals update.
+    programmer.setCPUClock(LOW);
+  }
+  Serial.println("Found difference");
+  // Just in case, set bus mode to INPUT.
+  programmer.setBusMode(INPUT);
+  while (true) {}
 }
 
 void read256() {
