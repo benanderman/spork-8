@@ -2,7 +2,7 @@
 
 This is to document all the issues (and fixes to them) of each revision of boards.
 
-## Revision 3 (re-build in progress)
+## Revision 3
 * **Clock**:
   * Switched to a vertical potentiometer, to be more ergnomic. It's probably higher Ohms as well.
 * **ALU** fully works.
@@ -13,13 +13,17 @@ This is to document all the issues (and fixes to them) of each revision of board
   * Switched to USB-C from USB-B.
   * Remove pull-down resistors for control lines, since the outputs from the EEPROMs never float.
   * Removed the inaccurate line over the Zero flag on the silk screen.
+  * Signal 15 (`instruction register in`) is inverted accidentally. Easily worked around in the microcode.
 * **Counter** fully works.
 * **RAM / ROM**:
   * Added a cartridge slot, using the most significant bit of the address to select between the cartridge and on-board EEPROM.
-* **General fixes and improvements**:
+* **General fixes, improvements, and issues**:
   * Binary display on all boards is corrected.
-  * Switched to HC chips, which should use much less power.
+  * Switched to HC chips, which use MUCH less power (~3A vs. ~0.1A).
   * Added screw holes to all boards to be able to mount it.
+  * While it generally works reliably at 2MHz, it only does so on battery at ~3.7V, and the Call / Return instructions don't work (but they work at slower speeds). It's still unclear what isn't working or why.
+  * When assembled with 10kOhm pull down resistors on the bus, the voltage doesn't dissipate fast enough to read a constant 0 without outputting anything it at faster speeds. This is presumably because the bus wires are very long, and therefore have a high capacitance. The above issue could be related to this.
+  * There's now an emulator, written in Zig, which supports controller input and screen display (but no).
 * **New boards**:
   * IO module: replaces Input, to have output and input next to each other. The trade-off is that for inputting, it doesn't hold the input value in a register, it just directly connects it to the bus, and for outputting, the outputted value (which is stored in a register) is write-only (it can't be copied back out). But it makes it much more convenient to interface with a shift register.
   * Battery module: holds a battery, can charge it, and has a switch to output power to the CPU. Plugs into the non-addressable module slot on the bottom bus boards.
@@ -27,8 +31,8 @@ This is to document all the issues (and fixes to them) of each revision of board
   * Screen peripheral board: 10x20 595-shift register-based monochrome display. Plugs into output module (vertically), or IO module (horizontally).
   * Programming board: Arduino-based board used to program and test the CPU in 3 ways:
     1. Separate from the CPU, read / write to EEPROMs (big ones, or cartridges).
-    2. Plug into bus boards, to test all the modules plugged in.
-    3. Replace the program memory and clock, to have a very fast development cycle to write program code.
+    2. Plug into bus boards, to test all the modules plugged in (doesn't work, because the bus is needed to set the signals, but that could cause bus contention).
+    3. Replace the program memory and clock, to have a very fast development cycle to write program code (not necessary now that there's an emulator), or to test the CPU.
 
 ## Revision 2
 
