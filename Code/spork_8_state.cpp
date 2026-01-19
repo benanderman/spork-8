@@ -82,12 +82,13 @@ void spork8_state_cycle_module(Spork8State *state, uint8_t index, ModuleSignals 
       // std::cerr << "Cycling memory " << (int)index << (signals.out ? " OUT" : "") << (signals.in ? " IN" : "") << "\n";
       uint8_t address_module = spork8_state_input1_module_index_for_index(index);
       uint16_t address = state->module_values[address_module];
-      uint8_t *memory = index == PMEM ? state->progmem : state->ram;
-      if (signals.out) {
-        state->bus = memory[address];
+      uint8_t (*get_memory_func)(uint16_t) = index == PMEM ? state->get_progmem_byte : state->get_ram_byte;
+      if (signals.out && get_memory_func) {
+        state->bus = get_memory_func(address);
       }
-      if (signals.in) {
-        memory[address] = state->bus;
+      if (signals.in && index == SRAM && state->set_ram_byte) {
+        state->set_ram_byte(address, state->bus);
+        // memory[address] = state->bus;
       }
       return;
     }
@@ -126,7 +127,13 @@ void spork8_state_cycle_module(Spork8State *state, uint8_t index, ModuleSignals 
       uint8_t input_module = spork8_state_input1_module_index_for_index(index);
       uint8_t input_value = state->module_values[input_module];
       if (signals.out) {
-        // TODO: Handle output
+        bool right = signals.sig0;
+        bool rotate = signals.sig1;
+        uint8_t out_value = right ? (input_value >> 1) : (input_value << 1);
+        if (rotate) {
+          out_value |= right ? (input_value << 7) : (input_value >> 7);
+        }
+        state->bus = out_value;
       }
       return;
     }

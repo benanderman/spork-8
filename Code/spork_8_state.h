@@ -45,8 +45,9 @@ typedef struct Spork8State {
   uint8_t mi_counter;
   uint8_t bus;
 
-  uint8_t *progmem;
-  uint8_t *ram;
+  uint8_t (*get_progmem_byte)(uint16_t address);
+  uint8_t (*get_ram_byte)(uint16_t address);
+  void (*set_ram_byte)(uint16_t address, uint8_t value);
 } Spork8State;
 
 void spork8_state_reset(Spork8State *state);
