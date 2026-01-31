@@ -262,7 +262,7 @@ ITER_X = 0x03
 
 #addr 0x8000
 main:
-  Call clear_display
+  Jump clear_display
   LoadI   A 4
   StoreZP A DOT_X
   LoadI   A 1
@@ -296,12 +296,12 @@ main:
   LoadI      InOutA CONTROLLER_SHLD | CONTROLLER_CLK
   LoadI      InOutA CONTROLLER_SHLD
   CmpAndReg  InOutA ; Start
-  CallNZ     clear_display
+  JumpNZ     clear_display
   
   LoadI      InOutA CONTROLLER_SHLD | CONTROLLER_CLK
   LoadI      InOutA CONTROLLER_SHLD
   CmpAndReg  InOutA ; Select
-  CallNZ     fill_display
+  JumpNZ     fill_display
   
   LoadI      InOutA CONTROLLER_SHLD | CONTROLLER_CLK
   LoadI      InOutA CONTROLLER_SHLD
@@ -406,8 +406,8 @@ clear_display:
   ; LoadI OutA  SER | SRCLCK
   LoadI OutA  RCLCK
   LoadI OutA  0
-  Return
-  ; Jump input_loop
+  ; Return
+  Jump input_loop
 
 fill_display:
   LoadI A PIXELS
