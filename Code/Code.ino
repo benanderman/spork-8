@@ -8,6 +8,8 @@
 
 Spork8::WriteCallback verifyCallback = NULL;
 
+bool writeSuccessful = true;
+
 void setup() {
   Serial.begin(57600);
 //  read256();
@@ -197,18 +199,20 @@ void writeProgram() {
   Serial.println("Reading");
   verifyCallback = getMovingDotByte;
   programmer.readRange(0, 1 << 10, printAndVerifyByte, false);
+  digitalWrite(programmer.conf.eepromCEPin, writeSuccessful);
 }
 
 void writeMicrocode(bool highBytes) {
+  Serial.println("Writing microcode");
   Programmer programmer = getNewProgrammer();
   Programmer::WriteCallback callback = highBytes ? getMicrocodeHighByte : getMicrocodeLowByte;
-  Serial.println("Writing microcode");
   uint16_t start = 0; // 0x1780;
   uint16_t end = 1 << 15; // 0x1A40;
   programmer.writeRange(start, end - start, callback);
   Serial.println("Reading");
   verifyCallback = callback;
   programmer.readRange(start, end - start, printAndVerifyByte);
+  digitalWrite(programmer.conf.eepromCEPin, writeSuccessful);
 }
 
 void printMicrocode() {  
@@ -236,10 +240,11 @@ void printMemoryByte(uint16_t address, byte value) {
 }
 
 void printAndVerifyByte(uint16_t address, byte value) {
-//  printMemoryByte(address, verifyCallback(address));
+  // printMemoryByte(address, verifyCallback(address));
   byte expectedValue = verifyCallback(address);
   printMemoryByte(address, value);
   if (expectedValue != value) {
+    writeSuccessful = false;
     Serial.print("(");
     if (expectedValue < 16) {
       Serial.print('0'); // leading zero
