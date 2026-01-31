@@ -273,6 +273,7 @@ LAST_DIR = 0x13
 PAUSED   = 0x14
 FOOD     = 0x15
 RAND     = 0x16
+SPEED    = 0x17
 
 SNAKE_HEAD = 0x20
 SNAKE_TAIL = 0x21
@@ -307,11 +308,12 @@ init:
   StoreI    SNAKE_PAGE_Y * 0x100 + 1    1
   StoreI    SNAKE_PAGE_Y * 0x100 + 2    2
   StoreI    FOOD                        8 * 10 + 5
+  StoreI    SPEED                       168
 
   Jump init_return
 
 game_loop:
-  LoadI C 128 ; Check for input n times before doing anything else, to add delay
+  Load C SPEED ; Check for input n times before doing anything else, to add delay
   input_loop:
     Jump        handle_input
     handle_input_return:
@@ -523,7 +525,14 @@ advance_snake:
   Jump        advance_snake_return
 
   .move_food:
-  Load  A    FOOD
+  ; Speed *= 0.75
+  Load   A    SPEED
+  Copy   A, B
+  ShiftR 2
+  AccumulateSub
+  Store  A    SPEED
+
+  Load   A    FOOD
   .move_food_loop:
     Add         RAND
     ; If new location > PIXELS, loop.
