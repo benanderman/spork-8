@@ -19,8 +19,8 @@ Instruction getInstruction(uint8_t index) {
   INSTRUCTION(Instruction::Type::SetPageReg, Instruction::FlagsMask::UNCONDITIONAL, 0, REGC);
   INSTRUCTION(Instruction::Type::SetPageReg, Instruction::FlagsMask::UNCONDITIONAL, 0, SWAP);
   INSTRUCTION(Instruction::Type::SetPageI,   Instruction::FlagsMask::UNCONDITIONAL, 1);
-  
-    INSTRUCTION(Instruction::Type::SetAddrReg, Instruction::FlagsMask::UNCONDITIONAL, 0, REGA);
+
+  INSTRUCTION(Instruction::Type::SetAddrReg, Instruction::FlagsMask::UNCONDITIONAL, 0, REGA);
   INSTRUCTION(Instruction::Type::SetAddrReg, Instruction::FlagsMask::UNCONDITIONAL, 0, REGB);
   INSTRUCTION(Instruction::Type::SetAddrReg, Instruction::FlagsMask::UNCONDITIONAL, 0, REGC);
   INSTRUCTION(Instruction::Type::SetAddrReg, Instruction::FlagsMask::UNCONDITIONAL, 0, SWAP);
