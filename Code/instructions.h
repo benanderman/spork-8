@@ -2,10 +2,12 @@
 #define INSTRUCTIONS_H
 
 #ifndef uint8_t
-#define uint8_t unsigned char
+// #define uint8_t unsigned char
+typedef unsigned char uint8_t;
 #endif
 #ifndef uint16_t
-#define uint16_t unsigned short
+// #define uint16_t unsigned short
+typedef unsigned int uint16_t;
 #endif
 
 // Marks an instruction as assuming a constant 0 or 1 value after it.
@@ -53,7 +55,6 @@ class Instruction {
     CmpAnd,
     CmpReg,
     CmpAndReg,
-    Mult,
     ShiftL,
     ShiftR,
     RotateL,
