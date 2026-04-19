@@ -113,8 +113,8 @@ void spork8_state_cycle_module(Spork8State *state, uint8_t index, ModuleSignals 
         }
         if (signals.in) {
           bool is_zero = out_value == 0;
-          out_value = (out_value & ~0b01) | (overflow ? 0b01 : 0);
-          out_value = (out_value & ~0b10) | (is_zero  ? 0b10 : 0);
+          out_value = (out_value & ~0b01) | (!overflow ? 0b01 : 0);
+          out_value = (out_value & ~0b10) | (is_zero   ? 0b10 : 0);
           // fprintf(stderr, "ALU flags: %p\n", out_value);
         }
         state->bus = out_value;
