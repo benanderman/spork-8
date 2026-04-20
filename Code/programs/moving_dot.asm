@@ -262,11 +262,11 @@ ITER_X = 0x03
 
 #addr 0x8000
 main:
-  Jump clear_display
   LoadI   A 4
-  StoreZP A DOT_X
+  Store   A DOT_X
   LoadI   A 1
-  StoreZP A DOT_Y
+  Store   A DOT_Y
+  Jump display
   
   input_loop:
   LoadI A       CONTROLLER_SER
@@ -347,11 +347,11 @@ right:
 
 display:
   LoadI A 0
-  StoreZP A ITER_Y
+  Store A ITER_Y
   .row_loop:
     ;LoadI C 0
   LoadI A 0
-    StoreZP A ITER_X
+    Store A ITER_X
       .col_loop:
       Load A  DOT_X
       Cmp  ITER_X
