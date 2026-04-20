@@ -274,6 +274,7 @@ PAUSED   = 0x14
 FOOD     = 0x15
 RAND     = 0x16
 SPEED    = 0x17
+ITER     = 0x18
 
 SNAKE_HEAD = 0x20
 SNAKE_TAIL = 0x21
@@ -297,29 +298,42 @@ init:
     StoreInc C, 1
     SubI 1
     JumpNZ .clear_loop
-  StoreI    DIR                         DOWN
-  StoreI    LAST_DIR                    DOWN
-  StoreI    SNAKE_TAIL                  0
-  StoreI    SNAKE_HEAD                  2
-  StoreI    SNAKE_PAGE_X * 0x100 + 0    4
-  StoreI    SNAKE_PAGE_X * 0x100 + 1    4
-  StoreI    SNAKE_PAGE_X * 0x100 + 2    4
-  StoreI    SNAKE_PAGE_Y * 0x100 + 0    0
-  StoreI    SNAKE_PAGE_Y * 0x100 + 1    1
-  StoreI    SNAKE_PAGE_Y * 0x100 + 2    2
-  StoreI    FOOD                        8 * 10 + 5
-  StoreI    SPEED                       168
+  LoadI  A  DOWN
+  Store  A  DIR
+  LoadI  A  DOWN
+  Store  A  LAST_DIR
+  LoadI  A  0
+  Store  A  SNAKE_TAIL
+  LoadI  A  2
+  Store  A  SNAKE_HEAD
+  LoadI  A  4
+  Store  A  SNAKE_PAGE_X * 0x100 + 0
+  LoadI  A  4
+  Store  A  SNAKE_PAGE_X * 0x100 + 1
+  LoadI  A  4
+  Store  A  SNAKE_PAGE_X * 0x100 + 2
+  LoadI  A  0
+  Store  A  SNAKE_PAGE_Y * 0x100 + 0
+  LoadI  A  1
+  Store  A  SNAKE_PAGE_Y * 0x100 + 1
+  LoadI  A  2
+  Store  A  SNAKE_PAGE_Y * 0x100 + 2
+  LoadI  A  8 * 10 + 5
+  Store  A  FOOD
+  LoadI  A  255
+  Store  A  SPEED
 
   Jump init_return
 
 game_loop:
-  Load C SPEED ; Check for input n times before doing anything else, to add delay
+  Load  A SPEED ; Check for input n times before doing anything else, to add delay
+  Store A ITER
   input_loop:
     Jump        handle_input
     handle_input_return:
-    Copy C, A
+    Load A  ITER
     SubI        1
-    Copy A, C
+    Store A ITER
     JumpNZ      input_loop
 
   Jump advance_snake
@@ -401,28 +415,32 @@ handle_input:
     LoadI A DOWN
     Cmp     LAST_DIR
     JumpZ .up_return
-    StoreI  DIR UP
+    LoadI A  UP
+    Store A  DIR
     Jump .up_return
     ; Return
   .down:
     LoadI A UP
     Cmp     LAST_DIR
     JumpZ .down_return
-    StoreI  DIR DOWN
+    LoadI A  DOWN
+    Store A  DIR
     Jump .down_return
     ; Return
   .left:
     LoadI A RIGHT
     Cmp     LAST_DIR
     JumpZ .left_return
-    StoreI  DIR LEFT
+    LoadI A  LEFT
+    Store A  DIR
     Jump .left_return
     ; Return
   .right:
     LoadI A LEFT
     Cmp     LAST_DIR
     JumpZ .right_return
-    StoreI  DIR RIGHT
+    LoadI A  RIGHT
+    Store A  DIR
     Jump .right_return
     ; Return
 
@@ -528,7 +546,7 @@ advance_snake:
   ; Speed *= 0.75
   Load   A    SPEED
   Copy   A, B
-  ShiftR 2
+  ShiftR 4
   AccumulateSub
   Store  A    SPEED
 
@@ -537,7 +555,7 @@ advance_snake:
     Add         RAND
     ; If new location > PIXELS, loop.
     CmpI        PIXELS
-    JumpNC      .move_food_loop
+    JumpC       .move_food_loop
     ; SetPageI    DISP_BUF
     ; SetAddrReg  A
     ; LoadInc     C, 0
@@ -596,22 +614,37 @@ update_display:
   ; Return
 
 draw_display:
-  LoadI C   PIXELS - 1
+  LoadI A   PIXELS - 1
+  Store A   ITER
   SetPageI  DISP_BUF
   SetAddrI  0
   .loop:
-    SetAddrReg C
+    SetPageI   DISP_BUF
+    SetAddrReg A
     LoadInc A, 0
     CmpI    0
-    LoadI A 0
-    AddINZ  SER
-    Copy    A, OutA
-    AddI    SRCLCK
-    Copy    A, OutA
-    Copy    C, A
-    SubI    1
-    Copy    A, C
-    JumpNC  .loop
+    JumpZ   .send_zero
+
+    .send_one:
+    LoadI OutA  SER
+    LoadI OutA  SER | SRCLCK
+    Jump .loop_end
+
+    .send_zero:
+    LoadI OutA  0
+    LoadI OutA  SRCLCK
+
+    ; LoadI A 0
+    ; AddINZ  SER
+    ; Copy    A, OutA
+    ; AddI    SRCLCK
+    ; Copy    A, OutA
+
+    .loop_end:
+    Load  A  ITER
+    SubI     1
+    Store A  ITER
+    JumpC  .loop
   LoadI OutA  RCLCK
   LoadI OutA  0
   Jump draw_display_return
