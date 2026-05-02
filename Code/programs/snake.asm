@@ -467,6 +467,7 @@ advance_snake:
   LoadInc    C,    0             ; Load current head X into C
   SetPageI         SNAKE_PAGE_Y
   LoadInc    SWAP, 1             ; Load current head Y into SWAP, and increment MADR
+  SetPageI         SNAKE_PAGE_Y  ; Go to Y page again, in case the address increment overflowed
   StoreInc   SWAP, 0             ; Store current head Y in head+1
   AddI       1
   Store      A     SNAKE_HEAD    ; Advance snake head by 1
@@ -500,6 +501,7 @@ advance_snake:
   LoadInc    C,    0             ; Load current head Y into C
   SetPageI         SNAKE_PAGE_X
   LoadInc    SWAP, 1             ; Load current head X into SWAP, and increment MADR
+  SetPageI         SNAKE_PAGE_X  ; Go to X page again, in case the address increment overflowed
   StoreInc   SWAP, 0             ; Store current head X in head+1
   AddI       1
   Store      A     SNAKE_HEAD    ; Advance snake head by 1
