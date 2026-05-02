@@ -330,7 +330,7 @@ game_loop:
   Load  A SPEED ; Check for input n times before doing anything else, to add delay
   Store A ITER
   input_loop:
-    LoadI A 5 ; Check for input 5 times per loop
+    LoadI A 4 ; Check for input 4 times per loop
     Store A ITER2
     inner_input_loop:
       Jump        handle_input
@@ -553,26 +553,30 @@ advance_snake:
   Jump        advance_snake_return
 
   .move_food:
-  ; Speed *= 0.75
+  ; Speed -= Speed / 16
   Load   A    SPEED
   Copy   A, B
   ShiftR 4
   AccumulateSub
   Store  A    SPEED
 
-  Load   A    FOOD
   .move_food_loop:
+    Load   A    RAND
+    AddI   1
+    Store  A    RAND
+    Load   A    FOOD
     Add         RAND
+    Store  A    FOOD
     ; If new location > PIXELS, loop.
     CmpI        PIXELS
     JumpC       .move_food_loop
-    ; SetPageI    DISP_BUF
-    ; SetAddrReg  A
-    ; LoadInc     C, 0
-    ; CmpReg      C
-    ; JumpNZ      .move_food_loop
+    ; If new location wasn't empty on the screen this cycle
+    SetPageI    DISP_BUF
+    SetAddrReg  A
+    LoadInc     A, 0
+    CmpI        0
+    JumpNZ     .move_food_loop
 
-  Store A     FOOD
   Jump        advance_snake_return
 
 update_display:
