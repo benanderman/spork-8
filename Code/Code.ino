@@ -195,9 +195,9 @@ void writeProgram() {
   Programmer programmer = getNewProgrammer();
 
   Serial.println("Writing program");
-  programmer.writeRange(0, 1 << 10, getMovingDotByte, false);
+  programmer.writeRange(0, 1 << 10, getSnakeByte, false);
   Serial.println("Reading");
-  verifyCallback = getMovingDotByte;
+  verifyCallback = getSnakeByte;
   programmer.readRange(0, 1 << 10, printAndVerifyByte, false);
   digitalWrite(programmer.conf.eepromCEPin, writeSuccessful);
 }

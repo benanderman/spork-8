@@ -275,6 +275,7 @@ FOOD     = 0x15
 RAND     = 0x16
 SPEED    = 0x17
 ITER     = 0x18
+ITER2    = 0x19
 
 SNAKE_HEAD = 0x20
 SNAKE_TAIL = 0x21
@@ -329,12 +330,19 @@ game_loop:
   Load  A SPEED ; Check for input n times before doing anything else, to add delay
   Store A ITER
   input_loop:
-    Jump        handle_input
-    handle_input_return:
-    Load A  ITER
-    SubI        1
+    LoadI A 5 ; Check for input 5 times per loop
+    Store A ITER2
+    inner_input_loop:
+      Jump        handle_input
+      handle_input_return:
+      Load  A ITER2
+      SubI    1
+      Store A ITER2
+      JumpNZ  inner_input_loop
+    Load  A ITER
+    SubI    1
     Store A ITER
-    JumpNZ      input_loop
+    JumpNZ  input_loop
 
   Jump advance_snake
   advance_snake_return:
