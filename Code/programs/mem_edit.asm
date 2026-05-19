@@ -558,7 +558,109 @@ update_display:
     CmpI           PIXELH
     JumpNZ        .data_loop
 
-  .address_loop:
+  ; Draw address, low byte
+  Load         C  MEM_ADDR
+  LoadI        A  PIXELW - 1 ; Origin X position
+  SetAddrReg   A
+  SetPageI     DISP_BUF
+
+  Copy         C, A
+  AndINF       0b00000001
+  StoreInc     A, 0
+  Copy         MAdr, A
+  AddI         10
+  SetAddrReg   A
+  Copy         C, A
+  AndINF       0b00000010
+  StoreInc     A, 0
+  Copy         MAdr, A
+  AddI         10
+  SetAddrReg   A
+  Copy         C, A
+  AndINF       0b00000100
+  StoreInc     A, 0
+  Copy         MAdr, A
+  AddI         10
+  SetAddrReg   A
+  Copy         C, A
+  AndINF       0b00001000
+  StoreInc     A, 0
+  Copy         MAdr, A
+  AddI         10
+  SetAddrReg   A
+  Copy         C, A
+  AndINF       0b00010000
+  StoreInc     A, 0
+  Copy         MAdr, A
+  AddI         10
+  SetAddrReg   A
+  Copy         C, A
+  AndINF       0b00100000
+  StoreInc     A, 0
+  Copy         MAdr, A
+  AddI         10
+  SetAddrReg   A
+  Copy         C, A
+  AndINF       0b01000000
+  StoreInc     A, 0
+  Copy         MAdr, A
+  AddI         10
+  SetAddrReg   A
+  Copy         C, A
+  AndINF       0b10000000
+  StoreInc     A, 0
+
+  ; Draw address, high byte
+  Load         C  MEM_PAGE
+  LoadI        A  8 * PIXELW + PIXELW - 1 ; Origin Y + X position
+  SetAddrReg   A
+  SetPageI     DISP_BUF
+
+  Copy         C, A
+  AndINF       0b00000001
+  StoreInc     A, 0
+  Copy         MAdr, A
+  AddI         10
+  SetAddrReg   A
+  Copy         C, A
+  AndINF       0b00000010
+  StoreInc     A, 0
+  Copy         MAdr, A
+  AddI         10
+  SetAddrReg   A
+  Copy         C, A
+  AndINF       0b00000100
+  StoreInc     A, 0
+  Copy         MAdr, A
+  AddI         10
+  SetAddrReg   A
+  Copy         C, A
+  AndINF       0b00001000
+  StoreInc     A, 0
+  Copy         MAdr, A
+  AddI         10
+  SetAddrReg   A
+  Copy         C, A
+  AndINF       0b00010000
+  StoreInc     A, 0
+  Copy         MAdr, A
+  AddI         10
+  SetAddrReg   A
+  Copy         C, A
+  AndINF       0b00100000
+  StoreInc     A, 0
+  Copy         MAdr, A
+  AddI         10
+  SetAddrReg   A
+  Copy         C, A
+  AndINF       0b01000000
+  StoreInc     A, 0
+  Copy         MAdr, A
+  AddI         10
+  SetAddrReg   A
+  Copy         C, A
+  AndINF       0b10000000
+  StoreInc     A, 0
   
   ; Set offset "scroll bar"
   Load       A   MEM_OFFSET
