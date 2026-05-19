@@ -38,7 +38,7 @@ sub mappedName {
     return $name_map{$name};
 }
 
-my $instructions_file = `cat Code/instruction_set.cpp` or die "Couldn't read instructions file.\n";
+my $instructions_file = `cat instruction_set.cpp` or die "Couldn't read instructions file.\n";
 if ($instructions_file =~ /Instruction instructions\[\] = \{(.+?)\}/s) {
     my $instructions_block = $1;
     my $index = 0;
