@@ -41,13 +41,13 @@ uint16_t Instruction::microCodeForCycleFlags(uint8_t cycle, uint8_t flags) const
 uint16_t Instruction::getMicrocode(uint8_t cycle) const {
   switch (type) {
     MC_START(SetPageReg)
-      MI static_cast<uint16_t>(OUT(arg1) | IN(MADR) | MADR_BSELECT);
+      MI OUT(arg1) | IN(MADR) | MADR_BSELECT;
     MC_END
     MC_START(SetPageI)
       MI OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT;
     MC_END
     MC_START(SetAddrReg)
-      MI static_cast<uint16_t>(OUT(arg1) | IN(MADR));
+      MI OUT(arg1) | IN(MADR);
     MC_END
     MC_START(SetAddrI)
       MI OUT(PMEM) | IN(MADR) | PCNT_COUNT;
@@ -56,132 +56,129 @@ uint16_t Instruction::getMicrocode(uint8_t cycle) const {
     MC_START(Load)
       MI OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT;
       MI OUT(PMEM) | IN(MADR) | PCNT_COUNT;
-      MI static_cast<uint16_t>(OUT(SRAM) | IN(arg1));
+      MI OUT(SRAM) | IN(arg1);
     MC_END
     MC_START(LoadI)
-      MI static_cast<uint16_t>(OUT(PMEM) | IN(arg1) | PCNT_COUNT);
-    MC_END
-    MC_START(LoadZP)
-      MI IN(MADR) | MADR_BSELECT;
-      MI OUT(PMEM) | IN(MADR) | PCNT_COUNT;
-      MI static_cast<uint16_t>(OUT(SRAM) | IN(arg1));
+      MI OUT(PMEM) | IN(arg1) | PCNT_COUNT;
     MC_END
     MC_START(LoadP)
       MI OUT(PMEM) | IN(MADR) | PCNT_COUNT;
-      MI static_cast<uint16_t>(OUT(SRAM) | IN(arg1));
+      MI OUT(SRAM) | IN(arg1);
     MC_END
     MC_START(LoadInc)
-      MI static_cast<uint16_t>(OUT(SRAM) | IN(arg1));
-      MI static_cast<uint16_t>(arg2 > 0 ? (uint16_t)(MADR_COUNT) : 0);
+      MI OUT(SRAM) | IN(arg1);
+      MI arg2 > 0 ? (uint16_t)(MADR_COUNT) : 0;
+    MC_END
+    MC_START(LoadStck)
+      MI OUT(PMEM) | IN(MADR) | PCNT_COUNT;    // Set offset within stack frame.
+      MI OUT(STCK) | IN(MADR) | MADR_BSELECT;  // Go to current stack frame.
+      MI OUT(SRAM) | IN(arg1);                 // Copy value to register.
     MC_END
 
     MC_START(Store)
       MI OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT;
       MI OUT(PMEM) | IN(MADR) | PCNT_COUNT;
-      MI static_cast<uint16_t>(OUT(arg1) | IN(SRAM));
+      MI OUT(arg1) | IN(SRAM);
     MC_END
     MC_START(StoreI)
       MI OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT;
       MI OUT(PMEM) | IN(MADR) | PCNT_COUNT;
       MI OUT(PMEM) | IN(SRAM) | PCNT_COUNT;
     MC_END
-    MC_START(StoreZP)
-      MI IN(MADR) | MADR_BSELECT;
-      MI OUT(PMEM) | IN(MADR) | PCNT_COUNT;
-      MI static_cast<uint16_t>(OUT(arg1) | IN(SRAM));
-    MC_END
     MC_START(StoreP)
       MI OUT(PMEM) | IN(MADR) | PCNT_COUNT;
-      MI static_cast<uint16_t>(OUT(arg1) | IN(SRAM));
+      MI OUT(arg1) | IN(SRAM);
     MC_END
     MC_START(StoreInc)
-      MI static_cast<uint16_t>(OUT(arg1) | IN(SRAM));
-      MI static_cast<uint16_t>(arg2 > 0 ? (uint16_t)(MADR_COUNT) : 0);
+      MI OUT(arg1) | IN(SRAM);
+      MI arg2 > 0 ? (uint16_t)(MADR_COUNT) : 0;
     MC_END
-    
-    MC_START(Read)
-      MI IN(arg1);
+
+    MC_START(StoreStck)
+      MI OUT(PMEM) | IN(MADR) | PCNT_COUNT;        // Set offset within stack frame.
+      MI OUT(STCK) | IN(MADR) | MADR_BSELECT;      // Go to current stack frame.
+      MI OUT(arg1) | IN(SRAM);                     // Copy value to ram from register.
+    MC_END
+    MC_START(StoreNStck)
+      MI OUT(STCK)  | IN(MADR);                    // Copy stack to memory address low byte.
+      MI MADR_COUNT;                               // Increment stack.
+      MI OUT(MADR)  | IN(SWAP);                    // Copy incremented stack to swap register.
+      MI OUT(PMEM)  | IN(MADR)  | PCNT_COUNT;      // Set offset within stack frame.
+      MI OUT(SWAP)  | IN(MADR)  | MADR_BSELECT;    // Go to next stack frame.
+      MI OUT(arg1)  | IN(SRAM);                    // Copy value to ram from register.
+    MC_END
+    MC_START(StorePStck)
+      MI OUT(STCK)  | IN(REGA);                           // Copy stack to register A.
+      MI OUT(PMEM)  | IN(REGB)  | PCNT_COUNT;             // Copy constant 1 to register B, and count.
+      MI OUT(ALU)   | IN(MADR)  | ALU_SUB | MADR_BSELECT; // Go to previous stack frame.
+      MI OUT(PMEM)  | IN(MADR)  | PCNT_COUNT;             // Set offset within stack frame.
+      MI OUT(arg1)  | IN(SRAM);                           // Copy value to ram from register.
+    MC_END
+    MC_START(StoreStckI)
+      MI OUT(PMEM) | IN(MADR) | PCNT_COUNT;        // Set offset within stack frame.
+      MI OUT(STCK) | IN(MADR) | MADR_BSELECT;      // Go to current stack frame.
+      MI OUT(PMEM) | IN(SRAM) | PCNT_COUNT;        // Copy value to ram.
+    MC_END
+    MC_START(StoreNStckI)
+      MI OUT(STCK)  | IN(MADR);                    // Copy stack to memory address low byte.
+      MI MADR_COUNT;                               // Increment stack.
+      MI OUT(MADR)  | IN(SWAP);                    // Copy incremented stack to swap register.
+      MI OUT(PMEM)  | IN(MADR)  | PCNT_COUNT;      // Set offset within stack frame.
+      MI OUT(SWAP)  | IN(MADR)  | MADR_BSELECT;    // Go to next stack frame.
+      MI OUT(PMEM)  | IN(SRAM)  | PCNT_COUNT;      // Copy value to ram.
+    MC_END
+    MC_START(StorePStckI)
+      MI OUT(STCK)  | IN(REGA);                    // Copy stack to register A.
+      MI OUT(PMEM)  | IN(REGB)  | PCNT_COUNT;      // Copy constant 1 to register B, and count.
+      MI OUT(ALU)   | IN(MADR)  | MADR_BSELECT;    // Go to previous stack frame.
+      MI OUT(PMEM)  | IN(MADR)  | PCNT_COUNT;      // Set offset within stack frame.
+      MI OUT(PMEM)  | IN(SRAM)  | PCNT_COUNT;      // Copy value to ram.
     MC_END
     
     MC_START(Copy)
-      MI static_cast<uint16_t>(OUT(arg1) | IN(arg2) | arg3);
+      MI OUT(arg1) | IN(arg2) | arg3;
     MC_END
 
     MC_START(Jump)
       MI OUT(PMEM) | IN(SWAP) | PCNT_COUNT;
       MI OUT(PMEM) | IN(PCNT);
-      MI OUT(SWAP) | IN(PCNT) + PCNT_BSELECT;
+      MI OUT(SWAP) | IN(PCNT) | PCNT_BSELECT;
     MC_END
 
-    MC_START(Call) // Assumes a constant 1 after the instruction in PMEM
-      MI OUT(PMEM)  | IN(SWAP)  | PCNT_COUNT;                  // Copy 1 to SWAP
-      MI OUT(SWAP)  | IN(MADR)  | MADR_BSELECT;                // Go to the stack at (high byte) 0x01
-      MI OUT(STCK)  | IN(MADR);                                // Go to location within stack
-      MI MADR_COUNT | OUT(SWAP) | IN(MADR)     | MADR_BSELECT; // Go to stack + 1; and write 0x01 to high byte to prevent overflow
-      MI OUT(PCNT)  | IN(SRAM)  | PCNT_BSELECT;                // Copy more significant byte of instruction counter
-      MI MADR_COUNT | OUT(SWAP) | IN(MADR)     | MADR_BSELECT; // Go to stack + 2; and write 0x01 to high byte to prevent overflow
-      MI OUT(PCNT)  | IN(SRAM);                                // Copy less significant byte of instruction counter
-      MI OUT(MADR)  | IN(STCK);                                // Copy stack address back to stack pointer after increments
+    MC_START(JumpReg)
+      MI OUT(REGB) | IN(PCNT);
+      MI OUT(REGA) | IN(PCNT) | PCNT_BSELECT;
+    MC_END
+
+    MC_START(JumpMem)
+      MI OUT(SRAM) | IN(PCNT) | MADR_COUNT | PCNT_BSELECT;
+      MI OUT(SRAM) | IN(PCNT);
+    MC_END
+
+    MC_START(Call) // Assumes a constant 0, and address to return to after the instruction in PMEM
+      MI OUT(STCK)  | IN(MADR);                                // Copy stack to memory address low byte
+      MI MADR_COUNT;                                           // Increment stack
+      MI OUT(MADR)  | IN(STCK);                                // Copy incremented stack back to stack register
+      MI OUT(STCK)  | IN(MADR)  | MADR_BSELECT;                // Go to new stack frame
+      MI OUT(PMEM)  | IN(MADR)  | PCNT_COUNT;                  // Go to 0 within stack, increment past 0 in progmem
+      MI OUT(PMEM)  | IN(SRAM)  | PCNT_COUNT;                  // Write high byte to 0 within stack
+      MI MADR_COUNT;                                           // Increment address within stack to 1
+      MI OUT(PMEM)  | IN(SRAM)  | PCNT_COUNT;                  // Write low byte to 1 within stack
       // Jump to function:
       MI OUT(PMEM)  | IN(SWAP)  | PCNT_COUNT;
       MI OUT(PMEM)  | IN(PCNT);
       MI OUT(SWAP)  | IN(PCNT)  | PCNT_BSELECT;
     MC_END
-    MC_START(Return) // Assumes a constant 1 after the instruction in PMEM
-      MI OUT(STCK)  | IN(REGA);                          // Copy stack to register A
-      MI OUT(PMEM)  | IN(REGB) | PCNT_COUNT;             // Copy 1 to register B
-      MI OUT(REGB)  | IN(MADR) | MADR_BSELECT;           // Go to stack; at high byte 0x01
-      MI OUT(ALU)   | IN(MADR) | ALU_SUB;                // Go to stack - 1
-      MI OUT(SRAM)  | IN(PCNT) | PCNT_BSELECT;           // Copy more significant byte to instruction counter
-      MI OUT(STCK)  | IN(MADR);                          // Go to stack - 0
-      MI OUT(SRAM)  | IN(PCNT);                          // Copy less significant byte to instruction counter
-      MI OUT(ALU)   | IN(REGA) | ALU_SUB | PCNT_COUNT;   // Copy stack - 1 to A, to get stack - 2; skip past data byte 1 of Call*
-      MI OUT(ALU)   | IN(STCK) | ALU_SUB | PCNT_COUNT;   // Copy stack - 2 back to stack pointer after decrements (2 bytes were consumed); skip past data byte 2 of Call*
+    MC_START(Return) // Assumes a constant 0 after the instruction in PMEM
+      MI OUT(STCK)  | IN(MADR)  | MADR_BSELECT;              // Go to stack frame
+      MI OUT(PMEM)  | IN(MADR)  | PCNT_COUNT;                // Go to 0 within stack frame
+      MI OUT(SRAM)  | IN(PCNT)  | PCNT_BSELECT | MADR_COUNT; // Copy return address high byte, and count memory address to 1
+      MI OUT(STCK)  | IN(REGA);                              // Copy stack into A
+      MI OUT(MADR)  | IN(REGB);                              // Copy 1 to register B
+      MI OUT(SRAM)  | IN(PCNT);                              // Go to return address low byte
+      MI OUT(ALU)   | IN(STCK) | ALU_SUB;                    // Copy stack - 1 to stack register
     MC_END
-    MC_START(Push) // Assumes a constant 1 after the instruction in PMEM
-      MI OUT(PMEM)  | IN(SWAP)  | PCNT_COUNT;                  // Copy 1 to SWAP
-      MI OUT(SWAP)  | IN(MADR)  | MADR_BSELECT;                // Go to the stack at (high byte) 0x01
-      MI OUT(STCK)  | IN(MADR);                                // Go to location within stack
-      MI MADR_COUNT | OUT(SWAP) | IN(MADR) | MADR_BSELECT;     // Go to stack + 1, and write 0x01 to high byte to prevent overflow
-      MI static_cast<uint16_t>(OUT(arg1)   | IN(SRAM));        // Write register to stack
-      MI OUT(MADR)  | IN(STCK);                                // Write new stack pointer back to STCK
-    MC_END
-    MC_START(Pop) // Assumes a constant 1 after the instruction in PMEM
-      MI OUT(STCK)  | IN(REGA);                         // Copy stack to register A
-      MI OUT(PMEM)  | IN(REGB) | PCNT_COUNT;            // Copy 1 to register B
-      MI OUT(REGB)  | IN(MADR) | MADR_BSELECT;          // Go to stack, at high byte 0x01
-      MI OUT(STCK)  | IN(MADR);                         // Go to stack pointer
-      MI static_cast<uint16_t>(OUT(SRAM)  | IN(arg1));  // Copy value to register
-      MI OUT(ALU)   | IN(STCK) | ALU_SUB;               // Copy stack - 1 back to stack pointer
-    MC_END
-    MC_START(PushAll) // Assumes a constant 1 after the instruction in PMEM
-      MI MADR_COUNT;                                           // Count to 1
-      MI OUT(MADR)  | IN(SWAP);                                // Copy 1 to SWAP
-      MI OUT(SWAP)  | IN(MADR)  | MADR_BSELECT;                // Go to the stack at (high byte) 0x01
-      MI OUT(STCK)  | IN(MADR);                                // Go to location within stack
-      MI MADR_COUNT | OUT(SWAP) | IN(MADR)     | MADR_BSELECT; // Go to stack + 1, and write 0x01 to high byte to prevent overflow
-      MI OUT(REGA)  | IN(SRAM);                                // Write register A to stack
-      MI MADR_COUNT | OUT(SWAP) | IN(MADR)     | MADR_BSELECT; // Go to stack + 2, and write 0x01 to high byte to prevent overflow
-      MI OUT(REGB)  | IN(SRAM);                                // Write register B to stack
-      MI MADR_COUNT | OUT(SWAP) | IN(MADR)     | MADR_BSELECT; // Go to stack + 3, and write 0x01 to high byte to prevent overflow
-      MI OUT(REGC)  | IN(SRAM);                                // Write register C to stack
-      MI OUT(MADR)  | IN(STCK);                                // Write new stack pointer back to STCK
-    MC_END
-    MC_START(PopAll) // Assumes a constant 1 after the instruction in PMEM
-      MI OUT(STCK)  | IN(REGA) | MADR_COUNT;                   // Copy stack to register A, and count to 1
-      MI OUT(MADR)  | IN(REGB);                                // Copy 1 to register B
-      MI OUT(MADR)  | IN(SWAP);                                // Copy 1 to swap
-      MI OUT(REGB)  | IN(MADR) | MADR_BSELECT;                 // Go to stack, at high byte 0x01
-      MI OUT(ALU)   | IN(REGA) | ALU_SUB;                      // -1
-      MI OUT(ALU)   | IN(MADR) | ALU_SUB;                      // Go to stack - 2
-      MI OUT(ALU)   | IN(REGA) | ALU_SUB;                      // Put stack - 2 into REGA
-      MI OUT(ALU)   | IN(STCK) | ALU_SUB;                      // Copy stack - 3 back to stack pointer
-      MI OUT(SRAM)  | IN(REGA);                                // Copy value of stack - 2 to register A
-      MI MADR_COUNT | OUT(SWAP) | IN(MADR)     | MADR_BSELECT; // Go to stack - 1, and write 0x01 to high byte to prevent overflow
-      MI OUT(SRAM)  | IN(REGB);                                // Copy value of stack - 1 to register B, go to stack - 0
-      MI MADR_COUNT | OUT(SWAP) | IN(MADR)     | MADR_BSELECT; // Go to stack - 0, and write 0x01 to high byte to prevent overflow
-      MI OUT(SRAM)  | IN(REGC);                                // Copy value of stack - 0 to register C
-    MC_END
+
     MC_START(CmpI)
       MI OUT(PMEM)  | IN(REGB) | PCNT_COUNT;
       MI IN(ALU)    | OUT(ALU) | ALU_SUB;     // Update flags
@@ -203,48 +200,48 @@ uint16_t Instruction::getMicrocode(uint8_t cycle) const {
       MI IN(ALU)   | OUT(ALU) | ALU_AND;                    // Update flags
     MC_END
     MC_START(CmpReg)
-      MI static_cast<uint16_t>(OUT(arg1)  | IN(REGB));
+      MI OUT(arg1)  | IN(REGB);
       MI IN(ALU)    | OUT(ALU) | ALU_SUB;    // Update flags
     MC_END
     MC_START(CmpAndReg)
-      MI static_cast<uint16_t>(OUT(arg1)  | IN(REGB));
+      MI OUT(arg1)  | IN(REGB);
       MI IN(ALU)    | OUT(ALU) | ALU_AND;    // Update flags
     MC_END
     MC_START(ShiftL)
-      MI static_cast<uint16_t>(arg1 > 0 ? OUT(SHFT)  | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 1 ? OUT(SHFT)  | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 2 ? OUT(SHFT)  | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 3 ? OUT(SHFT)  | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 4 ? OUT(SHFT)  | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 5 ? OUT(SHFT)  | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 6 ? OUT(SHFT)  | IN(REGB) : 0);
+      MI arg1 > 0 ? OUT(SHFT)  | IN(REGB) : 0;
+      MI arg1 > 1 ? OUT(SHFT)  | IN(REGB) : 0;
+      MI arg1 > 2 ? OUT(SHFT)  | IN(REGB) : 0;
+      MI arg1 > 3 ? OUT(SHFT)  | IN(REGB) : 0;
+      MI arg1 > 4 ? OUT(SHFT)  | IN(REGB) : 0;
+      MI arg1 > 5 ? OUT(SHFT)  | IN(REGB) : 0;
+      MI arg1 > 6 ? OUT(SHFT)  | IN(REGB) : 0;
     MC_END
     MC_START(ShiftR)
-      MI static_cast<uint16_t>(arg1 > 0 ? OUT(SHFT)  | SHIFT_RIGHT  | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 1 ? OUT(SHFT)  | SHIFT_RIGHT  | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 2 ? OUT(SHFT)  | SHIFT_RIGHT  | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 3 ? OUT(SHFT)  | SHIFT_RIGHT  | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 4 ? OUT(SHFT)  | SHIFT_RIGHT  | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 5 ? OUT(SHFT)  | SHIFT_RIGHT  | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 6 ? OUT(SHFT)  | SHIFT_RIGHT  | IN(REGB) : 0);
+      MI arg1 > 0 ? OUT(SHFT)  | SHIFT_RIGHT  | IN(REGB) : 0;
+      MI arg1 > 1 ? OUT(SHFT)  | SHIFT_RIGHT  | IN(REGB) : 0;
+      MI arg1 > 2 ? OUT(SHFT)  | SHIFT_RIGHT  | IN(REGB) : 0;
+      MI arg1 > 3 ? OUT(SHFT)  | SHIFT_RIGHT  | IN(REGB) : 0;
+      MI arg1 > 4 ? OUT(SHFT)  | SHIFT_RIGHT  | IN(REGB) : 0;
+      MI arg1 > 5 ? OUT(SHFT)  | SHIFT_RIGHT  | IN(REGB) : 0;
+      MI arg1 > 6 ? OUT(SHFT)  | SHIFT_RIGHT  | IN(REGB) : 0;
     MC_END
     MC_START(RotateL)
-      MI static_cast<uint16_t>(arg1 > 0 ? OUT(SHFT)  | SHIFT_ROTATE | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 1 ? OUT(SHFT)  | SHIFT_ROTATE | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 2 ? OUT(SHFT)  | SHIFT_ROTATE | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 3 ? OUT(SHFT)  | SHIFT_ROTATE | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 4 ? OUT(SHFT)  | SHIFT_ROTATE | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 5 ? OUT(SHFT)  | SHIFT_ROTATE | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 6 ? OUT(SHFT)  | SHIFT_ROTATE | IN(REGB) : 0);
+      MI arg1 > 0 ? OUT(SHFT)  | SHIFT_ROTATE | IN(REGB) : 0;
+      MI arg1 > 1 ? OUT(SHFT)  | SHIFT_ROTATE | IN(REGB) : 0;
+      MI arg1 > 2 ? OUT(SHFT)  | SHIFT_ROTATE | IN(REGB) : 0;
+      MI arg1 > 3 ? OUT(SHFT)  | SHIFT_ROTATE | IN(REGB) : 0;
+      MI arg1 > 4 ? OUT(SHFT)  | SHIFT_ROTATE | IN(REGB) : 0;
+      MI arg1 > 5 ? OUT(SHFT)  | SHIFT_ROTATE | IN(REGB) : 0;
+      MI arg1 > 6 ? OUT(SHFT)  | SHIFT_ROTATE | IN(REGB) : 0;
     MC_END
     MC_START(RotateR)
-      MI static_cast<uint16_t>(arg1 > 0 ? OUT(SHFT)  | SHIFT_ROTATE | SHIFT_RIGHT | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 1 ? OUT(SHFT)  | SHIFT_ROTATE | SHIFT_RIGHT | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 2 ? OUT(SHFT)  | SHIFT_ROTATE | SHIFT_RIGHT | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 3 ? OUT(SHFT)  | SHIFT_ROTATE | SHIFT_RIGHT | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 4 ? OUT(SHFT)  | SHIFT_ROTATE | SHIFT_RIGHT | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 5 ? OUT(SHFT)  | SHIFT_ROTATE | SHIFT_RIGHT | IN(REGB) : 0);
-      MI static_cast<uint16_t>(arg1 > 6 ? OUT(SHFT)  | SHIFT_ROTATE | SHIFT_RIGHT | IN(REGB) : 0);
+      MI arg1 > 0 ? OUT(SHFT)  | SHIFT_ROTATE | SHIFT_RIGHT | IN(REGB) : 0;
+      MI arg1 > 1 ? OUT(SHFT)  | SHIFT_ROTATE | SHIFT_RIGHT | IN(REGB) : 0;
+      MI arg1 > 2 ? OUT(SHFT)  | SHIFT_ROTATE | SHIFT_RIGHT | IN(REGB) : 0;
+      MI arg1 > 3 ? OUT(SHFT)  | SHIFT_ROTATE | SHIFT_RIGHT | IN(REGB) : 0;
+      MI arg1 > 4 ? OUT(SHFT)  | SHIFT_ROTATE | SHIFT_RIGHT | IN(REGB) : 0;
+      MI arg1 > 5 ? OUT(SHFT)  | SHIFT_ROTATE | SHIFT_RIGHT | IN(REGB) : 0;
+      MI arg1 > 6 ? OUT(SHFT)  | SHIFT_ROTATE | SHIFT_RIGHT | IN(REGB) : 0;
     MC_END
     MC_START(AddI)
       MI OUT(PMEM)  | IN(REGB) | PCNT_COUNT;

@@ -42,14 +42,6 @@ Instruction getInstruction(uint8_t index) {
   INSTRUCTION(Instruction::Type::LoadI,     Instruction::FlagsMask::UNCONDITIONAL, 1, IOA);
   INSTRUCTION(Instruction::Type::LoadI,     Instruction::FlagsMask::UNCONDITIONAL, 1, IOB);
 
-  INSTRUCTION(Instruction::Type::LoadZP,    Instruction::FlagsMask::UNCONDITIONAL, 1, REGA);
-  INSTRUCTION(Instruction::Type::LoadZP,    Instruction::FlagsMask::UNCONDITIONAL, 1, REGB);
-  INSTRUCTION(Instruction::Type::LoadZP,    Instruction::FlagsMask::UNCONDITIONAL, 1, REGC);
-  INSTRUCTION(Instruction::Type::LoadZP,    Instruction::FlagsMask::UNCONDITIONAL, 1, SWAP);
-  INSTRUCTION(Instruction::Type::LoadZP,    Instruction::FlagsMask::UNCONDITIONAL, 1, OUTA);
-  INSTRUCTION(Instruction::Type::LoadZP,    Instruction::FlagsMask::UNCONDITIONAL, 1, IOA);
-  INSTRUCTION(Instruction::Type::LoadZP,    Instruction::FlagsMask::UNCONDITIONAL, 1, IOB);
-
   INSTRUCTION(Instruction::Type::LoadP,     Instruction::FlagsMask::UNCONDITIONAL, 1, REGA);
   INSTRUCTION(Instruction::Type::LoadP,     Instruction::FlagsMask::UNCONDITIONAL, 1, REGB);
   INSTRUCTION(Instruction::Type::LoadP,     Instruction::FlagsMask::UNCONDITIONAL, 1, REGC);
@@ -70,6 +62,12 @@ Instruction getInstruction(uint8_t index) {
   INSTRUCTION(Instruction::Type::LoadInc,   Instruction::FlagsMask::UNCONDITIONAL, 0, SWAP, 1);
   INSTRUCTION(Instruction::Type::LoadInc,   Instruction::FlagsMask::UNCONDITIONAL, 0, OUTA, 1);
 
+  INSTRUCTION(Instruction::Type::LoadStck,  Instruction::FlagsMask::UNCONDITIONAL, 1, REGA);
+  INSTRUCTION(Instruction::Type::LoadStck,  Instruction::FlagsMask::UNCONDITIONAL, 1, REGB);
+  INSTRUCTION(Instruction::Type::LoadStck,  Instruction::FlagsMask::UNCONDITIONAL, 1, REGC);
+  INSTRUCTION(Instruction::Type::LoadStck,  Instruction::FlagsMask::UNCONDITIONAL, 1, SWAP);
+  INSTRUCTION(Instruction::Type::LoadStck,  Instruction::FlagsMask::UNCONDITIONAL, 1, OUTA);
+
   INSTRUCTION(Instruction::Type::Store,     Instruction::FlagsMask::UNCONDITIONAL, 2, REGA);
   INSTRUCTION(Instruction::Type::Store,     Instruction::FlagsMask::UNCONDITIONAL, 2, REGB);
   INSTRUCTION(Instruction::Type::Store,     Instruction::FlagsMask::UNCONDITIONAL, 2, REGC);
@@ -79,14 +77,6 @@ Instruction getInstruction(uint8_t index) {
   INSTRUCTION(Instruction::Type::Store,     Instruction::FlagsMask::UNCONDITIONAL, 2, IOB);
 
   INSTRUCTION(Instruction::Type::StoreI,    Instruction::FlagsMask::UNCONDITIONAL, 3);
-
-  INSTRUCTION(Instruction::Type::StoreZP,   Instruction::FlagsMask::UNCONDITIONAL, 1, REGA);
-  INSTRUCTION(Instruction::Type::StoreZP,   Instruction::FlagsMask::UNCONDITIONAL, 1, REGB);
-  INSTRUCTION(Instruction::Type::StoreZP,   Instruction::FlagsMask::UNCONDITIONAL, 1, REGC);
-  INSTRUCTION(Instruction::Type::StoreZP,   Instruction::FlagsMask::UNCONDITIONAL, 1, SWAP);
-  INSTRUCTION(Instruction::Type::StoreZP,   Instruction::FlagsMask::UNCONDITIONAL, 1, OUTA);
-  INSTRUCTION(Instruction::Type::StoreZP,   Instruction::FlagsMask::UNCONDITIONAL, 1, IOA);
-  INSTRUCTION(Instruction::Type::StoreZP,   Instruction::FlagsMask::UNCONDITIONAL, 1, IOB);
 
   INSTRUCTION(Instruction::Type::StoreP,    Instruction::FlagsMask::UNCONDITIONAL, 1, REGA);
   INSTRUCTION(Instruction::Type::StoreP,    Instruction::FlagsMask::UNCONDITIONAL, 1, REGB);
@@ -111,6 +101,23 @@ Instruction getInstruction(uint8_t index) {
   INSTRUCTION(Instruction::Type::StoreInc,  Instruction::FlagsMask::UNCONDITIONAL, 0, OUTA, 1);
   INSTRUCTION(Instruction::Type::StoreInc,  Instruction::FlagsMask::UNCONDITIONAL, 0, IOA,  1);
   INSTRUCTION(Instruction::Type::StoreInc,  Instruction::FlagsMask::UNCONDITIONAL, 0, IOB,  1);
+
+  INSTRUCTION(Instruction::Type::StoreStck,   Instruction::FlagsMask::UNCONDITIONAL, 1, REGA);
+  INSTRUCTION(Instruction::Type::StoreStck,   Instruction::FlagsMask::UNCONDITIONAL, 1, REGB);
+  INSTRUCTION(Instruction::Type::StoreStck,   Instruction::FlagsMask::UNCONDITIONAL, 1, REGC);
+  INSTRUCTION(Instruction::Type::StoreStck,   Instruction::FlagsMask::UNCONDITIONAL, 1, SWAP);
+
+  INSTRUCTION(Instruction::Type::StoreNStck,  Instruction::FlagsMask::UNCONDITIONAL, 1, REGA);
+  INSTRUCTION(Instruction::Type::StoreNStck,  Instruction::FlagsMask::UNCONDITIONAL, 1, REGB);
+  INSTRUCTION(Instruction::Type::StoreNStck,  Instruction::FlagsMask::UNCONDITIONAL, 1, REGC);
+
+  INSTRUCTION(Instruction::Type::StorePStck,  Instruction::FlagsMask::UNCONDITIONAL, CONST_ONE 2, REGC);
+
+  INSTRUCTION(Instruction::Type::StoreStckI,  Instruction::FlagsMask::UNCONDITIONAL, 2);
+
+  INSTRUCTION(Instruction::Type::StoreNStckI, Instruction::FlagsMask::UNCONDITIONAL, 2);
+
+  INSTRUCTION(Instruction::Type::StorePStckI, Instruction::FlagsMask::UNCONDITIONAL, CONST_ONE 3);
 
   INSTRUCTION(Instruction::Type::Copy,      Instruction::FlagsMask::UNCONDITIONAL, 0, REGA, REGB);
   INSTRUCTION(Instruction::Type::Copy,      Instruction::FlagsMask::UNCONDITIONAL, 0, REGA, REGC);
@@ -138,24 +145,17 @@ Instruction getInstruction(uint8_t index) {
   INSTRUCTION(Instruction::Type::Jump,      Instruction::FlagsMask::CF | Instruction::FlagsMask::NO_FLAGS, 2);
   INSTRUCTION(Instruction::Type::Jump,      Instruction::FlagsMask::ZF | Instruction::FlagsMask::NO_FLAGS, 2);
 
-  INSTRUCTION(Instruction::Type::Call,      Instruction::FlagsMask::UNCONDITIONAL, CONST_ONE(3));
-  INSTRUCTION(Instruction::Type::Call,      Instruction::FlagsMask::ZF | Instruction::FlagsMask::ZF_CF, CONST_ONE(3));
-  INSTRUCTION(Instruction::Type::Call,      Instruction::FlagsMask::CF | Instruction::FlagsMask::ZF_CF, CONST_ONE(3));
-  INSTRUCTION(Instruction::Type::Call,      Instruction::FlagsMask::CF | Instruction::FlagsMask::NO_FLAGS, CONST_ONE(3));
-  INSTRUCTION(Instruction::Type::Call,      Instruction::FlagsMask::ZF | Instruction::FlagsMask::NO_FLAGS, CONST_ONE(3));
+  INSTRUCTION(Instruction::Type::Call,      Instruction::FlagsMask::UNCONDITIONAL, CONST_ONE CONST_NEXT_ADDR 5);
+  INSTRUCTION(Instruction::Type::Call,      Instruction::FlagsMask::ZF | Instruction::FlagsMask::ZF_CF, CONST_ONE CONST_NEXT_ADDR 5);
+  INSTRUCTION(Instruction::Type::Call,      Instruction::FlagsMask::CF | Instruction::FlagsMask::ZF_CF, CONST_ONE CONST_NEXT_ADDR 5);
+  INSTRUCTION(Instruction::Type::Call,      Instruction::FlagsMask::CF | Instruction::FlagsMask::NO_FLAGS, CONST_ONE CONST_NEXT_ADDR 5);
+  INSTRUCTION(Instruction::Type::Call,      Instruction::FlagsMask::ZF | Instruction::FlagsMask::NO_FLAGS, CONST_ONE CONST_NEXT_ADDR 5);
 
-  INSTRUCTION(Instruction::Type::Return,    Instruction::FlagsMask::UNCONDITIONAL, CONST_ONE(1));
-
-  INSTRUCTION(Instruction::Type::Push,      Instruction::FlagsMask::UNCONDITIONAL, CONST_ONE(1), REGA);
-  INSTRUCTION(Instruction::Type::Push,      Instruction::FlagsMask::UNCONDITIONAL, CONST_ONE(1), REGB);
-  INSTRUCTION(Instruction::Type::Push,      Instruction::FlagsMask::UNCONDITIONAL, CONST_ONE(1), REGC);
-
-  INSTRUCTION(Instruction::Type::Pop,       Instruction::FlagsMask::UNCONDITIONAL, CONST_ONE(1), REGA);
-  INSTRUCTION(Instruction::Type::Pop,       Instruction::FlagsMask::UNCONDITIONAL, CONST_ONE(1), REGB);
-  INSTRUCTION(Instruction::Type::Pop,       Instruction::FlagsMask::UNCONDITIONAL, CONST_ONE(1), REGC);
-
-  INSTRUCTION(Instruction::Type::PushAll,   Instruction::FlagsMask::UNCONDITIONAL, CONST_ONE(1));
-  INSTRUCTION(Instruction::Type::PopAll,    Instruction::FlagsMask::UNCONDITIONAL, CONST_ONE(1));
+  INSTRUCTION(Instruction::Type::Return,    Instruction::FlagsMask::UNCONDITIONAL, CONST_ZERO 1);
+  INSTRUCTION(Instruction::Type::Return,    Instruction::FlagsMask::ZF | Instruction::FlagsMask::ZF_CF, CONST_ONE 1);
+  INSTRUCTION(Instruction::Type::Return,    Instruction::FlagsMask::CF | Instruction::FlagsMask::ZF_CF, CONST_ONE 1);
+  INSTRUCTION(Instruction::Type::Return,    Instruction::FlagsMask::CF | Instruction::FlagsMask::NO_FLAGS, CONST_ONE 1);
+  INSTRUCTION(Instruction::Type::Return,    Instruction::FlagsMask::ZF | Instruction::FlagsMask::NO_FLAGS, CONST_ONE 1);
 
   INSTRUCTION(Instruction::Type::CmpI,      Instruction::FlagsMask::UNCONDITIONAL, 1);
   INSTRUCTION(Instruction::Type::CmpAndI,   Instruction::FlagsMask::UNCONDITIONAL, 1);
