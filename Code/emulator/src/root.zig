@@ -80,7 +80,7 @@ const static_cartridge = [_]u8{
 var cartridge = [_]u8{0} ** 65536;
 
 // Jump to cartridge
-const progmem_eeprom = [_]u8{ 0x66, 0x80, 0x00 };
+const progmem_eeprom = [_]u8{ 0x66, 0x80, 0x00 } ** (65536 / 3);
 
 fn get_progmem_byte(address: c_ushort) callconv(.c) u8 {
     if (address & 1 << 15 != 0) {
@@ -101,8 +101,28 @@ fn set_ram_byte(address: c_ushort, value: u8) callconv(.c) void {
 
 var fully_initialized = false;
 
-pub fn run() !u8 {
+pub fn run(args: std.process.Args.Iterator, allocator: std.mem.Allocator, io: std.Io) !u8 {
     app_err.reset();
+
+    var mutable_args = args;
+
+    _ = mutable_args.next();
+    if (mutable_args.next()) |asm_path| {
+        const cwd = std.Io.Dir.cwd();
+
+        var file_contents = try allocator.alloc(u8, 65_536);
+        defer allocator.free(file_contents);
+        _ = try cwd.readFile(io, asm_path, file_contents);
+
+        for (file_contents[0x8000..], 0x8000..) |value, index| {
+            cartridge[index - 0x8000] = value;
+        }
+    } else {
+        for (static_cartridge, 0..) |value, index| {
+            cartridge[index] = value;
+        }
+    }
+
     var empty_argv: [0:null]?[*:0]u8 = .{};
     const status: u8 = @truncate(@as(c_uint, @bitCast(c.SDL_RunApp(empty_argv.len, @ptrCast(&empty_argv), sdlMainC, null))));
     return app_err.load() orelse status;
@@ -121,58 +141,6 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.SDL_AppResult {
     try errify(c.SDL_CreateWindowAndRenderer("Spork 8", window_w, window_h, 0, @ptrCast(&window), @ptrCast(&renderer)));
     errdefer c.SDL_DestroyWindow(window);
     errdefer c.SDL_DestroyRenderer(renderer);
-
-    if (std.os.argv.len > 1) {
-        const asm_path = std.mem.span(std.os.argv[1]);
-
-        // Call customasm directly - doesn't work because customasm doesn't print the same thing with -p
-        // var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-        // defer std.debug.assert(gpa.deinit() == .ok);
-        // const allocator = gpa.allocator();
-        // const result = try std.process.Child.run(.{
-        //     .allocator = allocator,
-        //     .argv = &[_][]const u8{ "customasm", asm_path, "-p", "-q", "-f", "binary" }, // The command and its arguments
-        //     .max_output_bytes = 65536, // Set a limit for output size
-        // });
-        // defer allocator.free(result.stdout);
-        // defer allocator.free(result.stderr);
-
-        // 1. Get the current working directory as a starting point.
-        const cwd = std.fs.cwd();
-
-        // 2. Open the file. The `.{}` uses default open flags (read-only is common).
-        // The `try` keyword handles potential errors.
-        const file = try cwd.openFile(asm_path, .{});
-        defer file.close(); // Ensure the file is closed when the function exits.
-
-        // 3. Get a general purpose allocator for dynamic memory management.
-        // The `defer gpa.deinit()` ensures memory leak detection in debug mode.
-        var gpa = std.heap.GeneralPurposeAllocator(.{ .thread_safe = true }){};
-        const allocator = gpa.allocator();
-        defer std.debug.assert(gpa.deinit() == .ok);
-
-        // 4. Read the entire file content into an allocated buffer.
-        // This function handles the allocation based on the file size.
-        // You provide a maximum size limit as a safety check.
-        const file_contents = try file.deprecatedReader().readAllAlloc(allocator, 65_536);
-        defer allocator.free(file_contents); // Free the allocated buffer.
-
-        for (file_contents[0x8000..], 0x8000..) |value, index| {
-            cartridge[index - 0x8000] = value;
-        }
-    } else {
-        for (static_cartridge, 0..) |value, index| {
-            cartridge[index] = value;
-        }
-    }
-
-    // for (cartridge[0..300], 0..300) |value, index| {
-    //     std.debug.print("Cartridge index, value: {}, val: {x}\n", .{ index, value });
-    // }
-
-    // for (progmem_eeprom, 0..) |value, index| {
-    //     progmem[index] = value;
-    // }
 
     c.spork8_state_reset(&state);
 
