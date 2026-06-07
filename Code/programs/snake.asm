@@ -108,16 +108,16 @@
   JumpC                               {address}            => 0x6A                @ address`16          
   JumpNZ                              {address}            => 0x6B                @ address`16          
   JumpNC                              {address}            => 0x6C                @ address`16          
-  Call                                {address}            => 0x6D01 @ ($ + 6)`16 @ address`16          
-  CallZ                               {address}            => 0x6E01 @ ($ + 6)`16 @ address`16          
-  CallC                               {address}            => 0x6F01 @ ($ + 6)`16 @ address`16          
-  CallNZ                              {address}            => 0x7001 @ ($ + 6)`16 @ address`16          
-  CallNC                              {address}            => 0x7101 @ ($ + 6)`16 @ address`16          
+  Call                                {address}            => 0x6D00 @ ($ + 6)`16 @ address`16          
+  CallZ                               {address}            => 0x6E00 @ ($ + 6)`16 @ address`16          
+  CallC                               {address}            => 0x6F00 @ ($ + 6)`16 @ address`16          
+  CallNZ                              {address}            => 0x7000 @ ($ + 6)`16 @ address`16          
+  CallNC                              {address}            => 0x7100 @ ($ + 6)`16 @ address`16          
   Return                                                   => 0x7200                                    
-  ReturnZ                                                  => 0x7301                                    
-  ReturnC                                                  => 0x7401                                    
-  ReturnNZ                                                 => 0x7501                                    
-  ReturnNC                                                 => 0x7601                                    
+  ReturnZ                                                  => 0x7300                                    
+  ReturnC                                                  => 0x7400                                    
+  ReturnNZ                                                 => 0x7500                                    
+  ReturnNC                                                 => 0x7600                                    
   CmpI                                {value}              => 0x77                @ value`8             
   CmpAndI                             {value}              => 0x78                @ value`8             
   Cmp                                 {address}            => 0x79                @ address`16          
@@ -238,9 +238,9 @@ PIXELH = 20
 PIXELS = PIXELW * PIXELH
 
 ; Memory page constants
-DISP_BUF     = 0x02
-SNAKE_PAGE_X = 0x03
-SNAKE_PAGE_Y = 0x04
+DISP_BUF     = 0x7F
+SNAKE_PAGE_X = 0x7E
+SNAKE_PAGE_Y = 0x7D
 
 ; Constants for input
 BUTTON_PAUSE  = 0b10000000
@@ -280,10 +280,12 @@ SNAKE_TAIL = 0x21
 
 #addr 0x8000
 main:
-  Jump  init
-  init_return:
-  Jump  game_loop
-  game_loop_return:
+  ; Jump  init
+  ; init_return:
+  Call  init
+  ; Jump  game_loop
+  ; game_loop_return:
+  Call  game_loop
   Jump  main
 
 init:
@@ -322,7 +324,8 @@ init:
   LoadI  A  255
   Store  A  SPEED
 
-  Jump init_return
+  ; Jump init_return
+  Return
 
 game_loop:
   Load  A SPEED ; Check for input n times before doing anything else, to add delay
@@ -342,14 +345,21 @@ game_loop:
     Store A ITER
     JumpNZ  input_loop
 
-  Jump advance_snake
-  advance_snake_return:
+  ; Jump advance_snake
+  ; advance_snake_return:
+  Call advance_snake
+  ; If the return value was 1 then return.
+  LoadStck A 0xFF
+  CmpI 1
+  ReturnZ
 
-  Jump update_display
-  update_display_return:
+  ; Jump update_display
+  ; update_display_return:
+  Call update_display
 
-  Jump draw_display
-  draw_display_return:
+  ; Jump draw_display
+  ; draw_display_return:
+  Call draw_display
 
   Jump game_loop
   ; Return
@@ -450,7 +460,12 @@ handle_input:
     Jump .right_return
     ; Return
 
+; Returns 1 if player died, 0 otherwise
 advance_snake:
+  ; Set return value to 1 in case we return early.
+  LoadI      C  1
+  StorePStck C  0xFF
+
   Load   A      DIR
   Store  A      LAST_DIR
   CmpAndI       HORIZONTAL_MASK
@@ -485,9 +500,11 @@ advance_snake:
 
   ; Reset if we went off the screen.
   CmpI       -1
-  JumpZ      main
+  ; JumpZ      main
+  ReturnZ
   CmpI       PIXELW
-  JumpZ      main
+  ; JumpZ      main
+  ReturnZ
 
   Jump .finish
 
@@ -519,9 +536,11 @@ advance_snake:
 
   ; Reset if we went off the screen.
   CmpI       -1
-  JumpZ      main
+  ; JumpZ      main
+  ReturnZ
   CmpI       PIXELH
-  JumpZ      main
+  ; JumpZ      main
+  ReturnZ
 
   .finish:
   ; Check for collision with food
@@ -548,7 +567,11 @@ advance_snake:
   Load  A     SNAKE_TAIL
   AddI        1
   Store A     SNAKE_TAIL
-  Jump        advance_snake_return
+  ; Jump        advance_snake_return
+  ; Set return value to 0; the player is not dead;
+  LoadI      C  0
+  StorePStck C  0xFF
+  Return
 
   .move_food:
   ; Speed -= Speed / 16
@@ -575,7 +598,11 @@ advance_snake:
     CmpI        0
     JumpNZ     .move_food_loop
 
-  Jump        advance_snake_return
+  ; Jump        advance_snake_return
+  ; Set return value to 0; the player is not dead;
+  LoadI      C  0
+  StorePStck C  0xFF
+  Return
 
 update_display:
   SetPageI  DISP_BUF
@@ -622,12 +649,13 @@ update_display:
   LoadI A       1
   StoreInc A, 0
 
-  Jump update_display_return
-  ; Return
+  ; Jump update_display_return
+  Return
 
 draw_display:
+  .ITER = 2
   LoadI A   PIXELS - 1
-  Store A   ITER
+  StoreStck A   .ITER
   SetPageI  DISP_BUF
   SetAddrI  0
   .loop:
@@ -646,18 +674,12 @@ draw_display:
     LoadI OutA  0
     LoadI OutA  SRCLCK
 
-    ; LoadI A 0
-    ; AddINZ  SER
-    ; Copy    A, OutA
-    ; AddI    SRCLCK
-    ; Copy    A, OutA
-
     .loop_end:
-    Load  A  ITER
+    LoadStck  A  .ITER
     SubI     1
-    Store A  ITER
+    StoreStck A  .ITER
     JumpC  .loop
   LoadI OutA  RCLCK
   LoadI OutA  0
-  Jump draw_display_return
-  ; Return
+  ; Jump draw_display_return
+  Return

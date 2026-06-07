@@ -80,7 +80,7 @@ const static_cartridge = [_]u8{
 var cartridge = [_]u8{0} ** 65536;
 
 // Jump to cartridge
-const progmem_eeprom = [_]u8{ 0x66, 0x80, 0x00 } ** (65536 / 3);
+const progmem_eeprom = [_]u8{ 0x66, 0x80, 0x00 };
 
 fn get_progmem_byte(address: c_ushort) callconv(.c) u8 {
     if (address & 1 << 15 != 0) {
@@ -88,6 +88,7 @@ fn get_progmem_byte(address: c_ushort) callconv(.c) u8 {
         if (cart_address >= cartridge.len) return 0;
         return cartridge[cart_address];
     }
+    if (address >= progmem_eeprom.len) return 0;
     return progmem_eeprom[address];
 }
 

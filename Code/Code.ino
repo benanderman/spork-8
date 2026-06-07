@@ -195,7 +195,7 @@ void writeProgram() {
   Programmer programmer = getNewProgrammer();
 
   Serial.println("Writing program");
-  verifyCallback = getMemEditByte;
+  verifyCallback = getSnakeByte;
   programmer.writeRange(0, 1 << 10, verifyCallback, false);
   Serial.println("Reading");
   programmer.readRange(0, 1 << 10, printAndVerifyByte, false);

@@ -145,17 +145,17 @@ Instruction getInstruction(uint8_t index) {
   INSTRUCTION(Instruction::Type::Jump,      Instruction::FlagsMask::CF | Instruction::FlagsMask::NO_FLAGS, 2);
   INSTRUCTION(Instruction::Type::Jump,      Instruction::FlagsMask::ZF | Instruction::FlagsMask::NO_FLAGS, 2);
 
-  INSTRUCTION(Instruction::Type::Call,      Instruction::FlagsMask::UNCONDITIONAL, CONST_ONE CONST_NEXT_ADDR 5);
-  INSTRUCTION(Instruction::Type::Call,      Instruction::FlagsMask::ZF | Instruction::FlagsMask::ZF_CF, CONST_ONE CONST_NEXT_ADDR 5);
-  INSTRUCTION(Instruction::Type::Call,      Instruction::FlagsMask::CF | Instruction::FlagsMask::ZF_CF, CONST_ONE CONST_NEXT_ADDR 5);
-  INSTRUCTION(Instruction::Type::Call,      Instruction::FlagsMask::CF | Instruction::FlagsMask::NO_FLAGS, CONST_ONE CONST_NEXT_ADDR 5);
-  INSTRUCTION(Instruction::Type::Call,      Instruction::FlagsMask::ZF | Instruction::FlagsMask::NO_FLAGS, CONST_ONE CONST_NEXT_ADDR 5);
+  INSTRUCTION(Instruction::Type::Call,      Instruction::FlagsMask::UNCONDITIONAL, CONST_ZERO CONST_NEXT_ADDR 5);
+  INSTRUCTION(Instruction::Type::Call,      Instruction::FlagsMask::ZF | Instruction::FlagsMask::ZF_CF, CONST_ZERO CONST_NEXT_ADDR 5);
+  INSTRUCTION(Instruction::Type::Call,      Instruction::FlagsMask::CF | Instruction::FlagsMask::ZF_CF, CONST_ZERO CONST_NEXT_ADDR 5);
+  INSTRUCTION(Instruction::Type::Call,      Instruction::FlagsMask::CF | Instruction::FlagsMask::NO_FLAGS, CONST_ZERO CONST_NEXT_ADDR 5);
+  INSTRUCTION(Instruction::Type::Call,      Instruction::FlagsMask::ZF | Instruction::FlagsMask::NO_FLAGS, CONST_ZERO CONST_NEXT_ADDR 5);
 
   INSTRUCTION(Instruction::Type::Return,    Instruction::FlagsMask::UNCONDITIONAL, CONST_ZERO 1);
-  INSTRUCTION(Instruction::Type::Return,    Instruction::FlagsMask::ZF | Instruction::FlagsMask::ZF_CF, CONST_ONE 1);
-  INSTRUCTION(Instruction::Type::Return,    Instruction::FlagsMask::CF | Instruction::FlagsMask::ZF_CF, CONST_ONE 1);
-  INSTRUCTION(Instruction::Type::Return,    Instruction::FlagsMask::CF | Instruction::FlagsMask::NO_FLAGS, CONST_ONE 1);
-  INSTRUCTION(Instruction::Type::Return,    Instruction::FlagsMask::ZF | Instruction::FlagsMask::NO_FLAGS, CONST_ONE 1);
+  INSTRUCTION(Instruction::Type::Return,    Instruction::FlagsMask::ZF | Instruction::FlagsMask::ZF_CF, CONST_ZERO 1);
+  INSTRUCTION(Instruction::Type::Return,    Instruction::FlagsMask::CF | Instruction::FlagsMask::ZF_CF, CONST_ZERO 1);
+  INSTRUCTION(Instruction::Type::Return,    Instruction::FlagsMask::CF | Instruction::FlagsMask::NO_FLAGS, CONST_ZERO 1);
+  INSTRUCTION(Instruction::Type::Return,    Instruction::FlagsMask::ZF | Instruction::FlagsMask::NO_FLAGS, CONST_ZERO 1);
 
   INSTRUCTION(Instruction::Type::CmpI,      Instruction::FlagsMask::UNCONDITIONAL, 1);
   INSTRUCTION(Instruction::Type::CmpAndI,   Instruction::FlagsMask::UNCONDITIONAL, 1);

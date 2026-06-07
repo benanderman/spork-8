@@ -83,7 +83,8 @@ uint16_t Instruction::getMicrocode(uint8_t cycle) const {
     MC_START(StoreI)
       MI OUT(PMEM) | IN(MADR) | MADR_BSELECT | PCNT_COUNT;
       MI OUT(PMEM) | IN(MADR) | PCNT_COUNT;
-      MI OUT(PMEM) | IN(SRAM) | PCNT_COUNT;
+      MI OUT(PMEM) | IN(SRAM);
+      MI PCNT_COUNT;
     MC_END
     MC_START(StoreP)
       MI OUT(PMEM) | IN(MADR) | PCNT_COUNT;
@@ -115,9 +116,10 @@ uint16_t Instruction::getMicrocode(uint8_t cycle) const {
       MI OUT(arg1)  | IN(SRAM);                           // Copy value to ram from register.
     MC_END
     MC_START(StoreStckI)
-      MI OUT(PMEM) | IN(MADR) | PCNT_COUNT;        // Set offset within stack frame.
-      MI OUT(STCK) | IN(MADR) | MADR_BSELECT;      // Go to current stack frame.
-      MI OUT(PMEM) | IN(SRAM) | PCNT_COUNT;        // Copy value to ram.
+      MI OUT(PMEM)  | IN(MADR)  | PCNT_COUNT;      // Set offset within stack frame.
+      MI OUT(STCK)  | IN(MADR)  | MADR_BSELECT;    // Go to current stack frame.
+      MI OUT(PMEM)  | IN(SRAM);                    // Copy value to ram.
+      MI PCNT_COUNT;
     MC_END
     MC_START(StoreNStckI)
       MI OUT(STCK)  | IN(MADR);                    // Copy stack to memory address low byte.
@@ -125,14 +127,16 @@ uint16_t Instruction::getMicrocode(uint8_t cycle) const {
       MI OUT(MADR)  | IN(SWAP);                    // Copy incremented stack to swap register.
       MI OUT(PMEM)  | IN(MADR)  | PCNT_COUNT;      // Set offset within stack frame.
       MI OUT(SWAP)  | IN(MADR)  | MADR_BSELECT;    // Go to next stack frame.
-      MI OUT(PMEM)  | IN(SRAM)  | PCNT_COUNT;      // Copy value to ram.
+      MI OUT(PMEM)  | IN(SRAM);                    // Copy value to ram.
+      MI PCNT_COUNT;
     MC_END
     MC_START(StorePStckI)
       MI OUT(STCK)  | IN(REGA);                    // Copy stack to register A.
       MI OUT(PMEM)  | IN(REGB)  | PCNT_COUNT;      // Copy constant 1 to register B, and count.
       MI OUT(ALU)   | IN(MADR)  | MADR_BSELECT;    // Go to previous stack frame.
       MI OUT(PMEM)  | IN(MADR)  | PCNT_COUNT;      // Set offset within stack frame.
-      MI OUT(PMEM)  | IN(SRAM)  | PCNT_COUNT;      // Copy value to ram.
+      MI OUT(PMEM)  | IN(SRAM);                    // Copy value to ram.
+      MI PCNT_COUNT;
     MC_END
     
     MC_START(Copy)
@@ -161,9 +165,10 @@ uint16_t Instruction::getMicrocode(uint8_t cycle) const {
       MI OUT(MADR)  | IN(STCK);                                // Copy incremented stack back to stack register
       MI OUT(STCK)  | IN(MADR)  | MADR_BSELECT;                // Go to new stack frame
       MI OUT(PMEM)  | IN(MADR)  | PCNT_COUNT;                  // Go to 0 within stack, increment past 0 in progmem
-      MI OUT(PMEM)  | IN(SRAM)  | PCNT_COUNT;                  // Write high byte to 0 within stack
-      MI MADR_COUNT;                                           // Increment address within stack to 1
-      MI OUT(PMEM)  | IN(SRAM)  | PCNT_COUNT;                  // Write low byte to 1 within stack
+      MI OUT(PMEM)  | IN(SRAM);                                // Write high byte to 0 within stack
+      MI MADR_COUNT | PCNT_COUNT;                              // Increment address within stack to 1, and skip past data byte
+      MI OUT(PMEM)  | IN(SRAM);                                // Write low byte to 1 within stack
+      MI PCNT_COUNT;                                           // Increment past data byte
       // Jump to function:
       MI OUT(PMEM)  | IN(SWAP)  | PCNT_COUNT;
       MI OUT(PMEM)  | IN(PCNT);
@@ -172,8 +177,8 @@ uint16_t Instruction::getMicrocode(uint8_t cycle) const {
     MC_START(Return) // Assumes a constant 0 after the instruction in PMEM
       MI OUT(STCK)  | IN(MADR)  | MADR_BSELECT;              // Go to stack frame
       MI OUT(PMEM)  | IN(MADR)  | PCNT_COUNT;                // Go to 0 within stack frame
-      MI OUT(SRAM)  | IN(PCNT)  | PCNT_BSELECT | MADR_COUNT; // Copy return address high byte, and count memory address to 1
-      MI OUT(STCK)  | IN(REGA);                              // Copy stack into A
+      MI OUT(SRAM)  | IN(PCNT)  | PCNT_BSELECT;              // Copy return address high byte
+      MI OUT(STCK)  | IN(REGA)  | MADR_COUNT;                // Copy stack into A, and count memory address to 1
       MI OUT(MADR)  | IN(REGB);                              // Copy 1 to register B
       MI OUT(SRAM)  | IN(PCNT);                              // Go to return address low byte
       MI OUT(ALU)   | IN(STCK) | ALU_SUB;                    // Copy stack - 1 to stack register
