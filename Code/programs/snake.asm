@@ -294,7 +294,7 @@ init:
   LoadI C   0
   .clear_loop:
     SetPageI  SNAKE_PAGE_X
-    StoreInc C, 1
+    StoreInc C, 0
     SetPageI  SNAKE_PAGE_Y
     StoreInc C, 1
     SubI 1
@@ -681,5 +681,4 @@ draw_display:
     JumpC  .loop
   LoadI OutA  RCLCK
   LoadI OutA  0
-  ; Jump draw_display_return
   Return
