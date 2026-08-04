@@ -43,17 +43,18 @@ if ($instructions_file =~ /getInstruction\(uint8_t index\) \{(.+?)\}/s) {
     my $instructions_block = $1;
     my $index = 0;
     my @rules;
-    while ($instructions_block =~/  INSTRUCTION\(Instruction::Type::(\w+?),.*?FlagsMask::(\w+)(?:\s*\|.*FlagsMask::(\w+))?,\s*(CONST_(?:ZERO|ONE))?\s*(CONST_NEXT_ADDR)?\s*(\d)(?:, (\w+))?(?:, (\w+))?(?:, (\w+))?/g) {
+    while ($instructions_block =~/  INSTRUCTION\(Instruction::Type::(\w+?),.*?FlagsMask::(\w+)(?:\s*\|.*FlagsMask::(\w+))?,\s*(CONST_(?:ZERO|ONE))?\s*(CONST_NEXT_ADDR)?\s*(TWO_VALUES)?\s*(\d)(?:,\s*(\w+))?(?:,\s*(\w+))?(?:,\s*(\w+))?/g) {
         my $arg_template = "";
         my $arg_value = "";
         my $flags1 = $2;
         my $flags2 = $3 ? "|$3" : "";
         my $flags_suffix = $flags_mapping{"$flags1$flags2"};
         my $inst = "$1$flags_suffix";
-        my $data_bytes = $6;
-        my $var1 = mappedName($7);
-        my $var2 = defined $8 ? ", ".mappedName($8) : "";
-        my $var3 = defined $9 ? ", ".mappedName($9) : "";
+        my $data_arg_format = $6 ? $6 : 'DEFAULT';
+        my $data_bytes = $7;
+        my $var1 = mappedName($8);
+        my $var2 = defined $9 ? ", ".mappedName($9) : "";
+        my $var3 = defined $10 ? ", ".mappedName($10) : "";
         my $vars = "$var1$var2$var3";
         my $zero_suffix = "  ";
         my $data_bytes_orig = $data_bytes;
@@ -67,11 +68,15 @@ if ($instructions_file =~ /getInstruction\(uint8_t index\) \{(.+?)\}/s) {
             $addr_suffix = ' @ ($ + ' . ($data_bytes_orig + 1) . ')`16';
         }
         if ($data_bytes != 0) {
-            $arg_template = $data_bytes == 1 ? "{value}" : "{address}";
-            $arg_value = $data_bytes == 1 ? "\@ value`8" : "\@ address`16";
             if ($data_bytes == 3) {
                 $arg_template = "{address} {value}";
                 $arg_value = "\@ address`16 \@ value`8";
+            } elsif ($data_arg_format eq 'TWO_VALUES') {
+                $arg_template = "{value1} {value2}";
+                $arg_value = "\@ value`8 \@ value`8";
+            } else {
+                $arg_template = $data_bytes == 1 ? "{value}" : "{address}";
+                $arg_value = $data_bytes == 1 ? "\@ value`8" : "\@ address`16";
             }
         }
         my $rule = sprintf("%-14s %-20s %-20s => 0x%02X%s%s %-22s", $inst, $vars, $arg_template, $index, $zero_suffix, $addr_suffix, $arg_value);

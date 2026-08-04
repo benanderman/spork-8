@@ -113,11 +113,11 @@ Instruction getInstruction(uint8_t index) {
 
   INSTRUCTION(Instruction::Type::StorePStck,  Instruction::FlagsMask::UNCONDITIONAL, CONST_ONE 2, REGC);
 
-  INSTRUCTION(Instruction::Type::StoreStckI,  Instruction::FlagsMask::UNCONDITIONAL, 2);
+  INSTRUCTION(Instruction::Type::StoreStckI,  Instruction::FlagsMask::UNCONDITIONAL, TWO_VALUES 2);
 
-  INSTRUCTION(Instruction::Type::StoreNStckI, Instruction::FlagsMask::UNCONDITIONAL, 2);
+  INSTRUCTION(Instruction::Type::StoreNStckI, Instruction::FlagsMask::UNCONDITIONAL, TWO_VALUES 2);
 
-  INSTRUCTION(Instruction::Type::StorePStckI, Instruction::FlagsMask::UNCONDITIONAL, CONST_ONE 3);
+  INSTRUCTION(Instruction::Type::StorePStckI, Instruction::FlagsMask::UNCONDITIONAL, CONST_ONE TWO_VALUES 3);
 
   INSTRUCTION(Instruction::Type::Copy,      Instruction::FlagsMask::UNCONDITIONAL, 0, REGA, REGB);
   INSTRUCTION(Instruction::Type::Copy,      Instruction::FlagsMask::UNCONDITIONAL, 0, REGA, REGC);

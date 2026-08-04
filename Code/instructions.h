@@ -17,6 +17,9 @@ typedef unsigned int uint16_t;
 // Marks an instruction as assuming its address + data bytes + 1 after it (comes after consts above).
 #define CONST_NEXT_ADDR 
 
+// Marks an instruction with 2 data bytes as taking 2 8-bit operands, not 1 16-bit address.
+#define TWO_VALUES 
+
 class Instruction {
   public:
 
