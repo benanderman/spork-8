@@ -73,7 +73,7 @@ if ($instructions_file =~ /getInstruction\(uint8_t index\) \{(.+?)\}/s) {
                 $arg_value = "\@ address`16 \@ value`8";
             } elsif ($data_arg_format eq 'TWO_VALUES') {
                 $arg_template = "{value1} {value2}";
-                $arg_value = "\@ value`8 \@ value`8";
+                $arg_value = "\@ value1`8 \@ value2`8";
             } else {
                 $arg_template = $data_bytes == 1 ? "{value}" : "{address}";
                 $arg_value = $data_bytes == 1 ? "\@ value`8" : "\@ address`16";
