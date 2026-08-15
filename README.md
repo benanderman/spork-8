@@ -33,7 +33,7 @@ In general, any of the 16 module slots can input from or output to the bus, so m
 
 **Bottom left**: The battery takes the top 0th slot, and then the stack and swap registers, and input / output A module after that. Other than the battery, the positions are arbitrary.
 
-**Bottom right**: The output A register goes at the top, then the RAM goes below it. The memory address register goes in the next position to get the first pair of custom signals (for count and byte select), and plugs into the RAM above. The input / output B module goes at the bottom. The memory address could instead go where output A is, and RAM just needs to be next to it. The other two could be anywhere.
+**Bottom right**: The output A register goes at the top and the RAM goes below it. The memory address register goes in the next position to get the first pair of custom signals (for count and byte select), and plugs into the RAM above it. The input / output B module goes at the bottom. The memory address could instead go where output A is, and RAM just needs to be next to it. The other two could go anywhere.
 
 ## Peripherals
 * **Controller Connector**: Plugs into IO module, and has two RJ12 plugs on it, to connect to parallel-to-serial shift register-based controllers.
