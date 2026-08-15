@@ -3,4 +3,17 @@
 *-bak
 *-cache.lib
 ~*.lck
+*.ses
+*.dsn
+fp-info-cache
+*-backups
+*-rescue*
+*.rules
+zig-out
+zig-pkg
+.history
+.zig-cache
+.vscode
+_restore_backup_*
+fabrication-toolkit-options.json
 
