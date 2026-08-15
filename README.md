@@ -19,6 +19,22 @@ In 2025, it was rebuilt with 74HC-series chips, and several improvements, an emu
  * **Input / Output**: Like a register module, except when outputting to the bus, outputs the value from input headers instead of the registers. The 8-bit value stored in the registers is accessible on output headers as well. The two headers are in parallel, making it sturdy to plug in a peripheral that uses both.
  * **Battery**: Has a battery, charging capability with USB-C, and a switch to output power to the CPU.
 
+## Layout
+
+In general, any of the 16 module slots can input from or output to the bus, so most modules could go in any position. However, some of them have to go in specific slots, because:
+
+1. The 0th slot on the top and bottom aren't usable for in/out selection, because it's ambiguous whether that slot is selected or if no module on that side is selected. The battery and clock go in those slots, since they only output power and a clock signal, and don't use the bus.
+1. The 8 "custom" signals (that mean something different for different modules) are split up into 4 for top, 4 for bottom. Those 4 are split into pairs; the top 2 modules on each bus board get one pair, and the bottom two get the second pair. The second pair of signals on the bottom is actually used by the control board.
+1. Some modules (RAM / ROM, ALU, and Shift) get inputs from other modules, so their inputs have to be next to them.
+
+**Top left**: The program counter goes in the top to use the first pair of custom signals (for count and byte select), plugging into the program memory below it. Below that is the clock (in the 0th position), and Register C.
+
+**Top right**: The ALU goes one slot down from the top, to use the second pair of custom signals (for add/subtract and bit-wise AND), with register A and B as its operands above and below. Then the shift / rotate module goes at the bottom plugging into register B. These need to be on the right side to avoid the 0th position. The shift module shares custom signals with the ALU, which is okay because only one is used at a time, and the signals don't have an effect if that module isn't outputting.
+
+**Bottom left**: The battery takes the top 0th slot, and then the stack and swap registers, and input / output A module after that. Other than the battery, the positions are arbitrary.
+
+**Bottom right**: The output A register goes at the top, then the RAM goes below it. The memory address register goes in the next position to get the first pair of custom signals (for count and byte select), and plugs into the RAM above. The input / output B module goes at the bottom. The memory address could instead go where output A is, and RAM just needs to be next to it. The other two could be anywhere.
+
 ## Peripherals
 * **Controller Connector**: Plugs into IO module, and has two RJ12 plugs on it, to connect to parallel-to-serial shift register-based controllers.
 * **Screen**: An 10x20 595-shift register-based monochrome display. Plugs into output module (vertically), or IO module (horizontally).
