@@ -6,7 +6,9 @@ This is an 8-bit computer project, inspired by [Ben Eater's 8-bit breadboard com
 
 The project was originally completed in 2021 and mostly worked with 74LS-series chips, but it had some issues (see [RevisionLog](RevisionLog.md)), and used way too much power.
 
-In 2025, it was rebuilt with 74HC-series chips, and several improvements, an emulator, and peripheral boards. It has some issues, but mostly works well.
+In 2025, it was rebuilt with 74HC-series chips, and several improvements, an emulator, and peripheral boards. It had some issues, but mostly worked well.
+
+In 2026, reliability was improved by adding ground planes to the bus boards and control board, the instruction set was improved, and much more complex programs were made.
 
 ## Modules
  * **Control module**: Coordinates everything else. Contains the micro-code EEPROMs, instruction register, micro-instruction counter, power input, reset button, and logic to interface with modules through bus boards.

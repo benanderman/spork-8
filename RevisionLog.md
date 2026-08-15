@@ -2,6 +2,14 @@
 
 This is to document all the issues (and fixes to them) of each revision of boards.
 
+## Revision 3.1
+* **Control Module & Bus boards**:
+  * Convert to 4 layer boards, with the middle 2 layers used as ground planes.
+  * Add an extra ground pin on each side of the board connectors.
+* **General fixes**:
+  * The purpose of this update was to generally improve reliability. Some instructions (like Call and Return) didn't work reliably, and it was unclear exactly what was going on. This update may not have made it 100% reliable, but it helped a lot. The 2 player snake game that wouldn't run before, now does run reliably.
+  * Fixed the labeling of top / bottom signals.
+
 ## Revision 3
 * **Clock**:
   * Switched to a vertical potentiometer, to be more ergnomic. It's probably higher Ohms as well.
@@ -13,7 +21,7 @@ This is to document all the issues (and fixes to them) of each revision of board
   * Switched to USB-C from USB-B.
   * Remove pull-down resistors for control lines, since the outputs from the EEPROMs never float.
   * Removed the inaccurate line over the Zero flag on the silk screen.
-  * Signal 15 (`instruction register in`) is inverted accidentally. Easily worked around in the microcode.
+  * Signal 15 (`instruction register in`) is inverted accidentally. Easily worked around in the microcode. Seemingly impossible to fix in hardware without adding another chip.
 * **Counter** fully works.
 * **RAM / ROM**:
   * Added a cartridge slot, using the most significant bit of the address to select between the cartridge and on-board EEPROM.
@@ -23,12 +31,12 @@ This is to document all the issues (and fixes to them) of each revision of board
   * Added screw holes to all boards to be able to mount it.
   * While it generally works reliably at 2MHz, it only does so on battery at ~3.7V, and the Call / Return instructions don't work (but they work at slower speeds). It's still unclear what isn't working or why.
   * When assembled with 10kOhm pull down resistors on the bus, the voltage doesn't dissipate fast enough to read a constant 0 without outputting anything it at faster speeds. This is presumably because the bus wires are very long, and therefore have a high capacitance. The above issue could be related to this.
-  * There's now an emulator, written in Zig, which supports controller input and screen display (but no).
+  * There's now an emulator, written in Zig, which supports controller input and screen display.
 * **New boards**:
   * IO module: replaces Input, to have output and input next to each other. The trade-off is that for inputting, it doesn't hold the input value in a register, it just directly connects it to the bus, and for outputting, the outputted value (which is stored in a register) is write-only (it can't be copied back out). But it makes it much more convenient to interface with a shift register.
   * Battery module: holds a battery, can charge it, and has a switch to output power to the CPU. Plugs into the non-addressable module slot on the bottom bus boards.
   * Controller Connector peripheral board: plugs into IO module, and has two RJ12 plugs on it, to connect to parallel-to-serial shift register-based controllers.
-  * Screen peripheral board: 10x20 595-shift register-based monochrome display. Plugs into output module (vertically), or IO module (horizontally).
+  * Screen peripheral board: 10x20 595-shift register-based monochrome display. Plugs into output module.
   * Programming board: Arduino-based board used to program and test the CPU in 3 ways:
     1. Separate from the CPU, read / write to EEPROMs (big ones, or cartridges).
     2. Plug into bus boards, to test all the modules plugged in (doesn't work, because the bus is needed to set the signals, but that could cause bus contention).
