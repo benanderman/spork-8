@@ -111,3 +111,24 @@ These images show the layout of the modules in the 16 slots, the functions of ea
 ![Controller Connector 3D render](Images/controller-connector-3d.png)
 ![Cartridge 3D render](Images/cartridge-3d.png)
 ![Programmer 3D render](Images/programmer-3d.png)
+
+## Contributing
+
+### Compiling Assembly Files
+
+Dependency: [customasm](https://hlorenzi.github.io/customasm/)
+
+```
+cd Code/emulator
+customasm ../programs/snake2p.asm -o ../programs/snake2p.bin -f binary
+```
+
+Then pass the .bin files to the emulator.
+
+### Compiling and Running the Emulator
+
+```
+cd Code/emulator
+zig build
+./zig-out/bin/emulator ../programs/snake2p.bin
+```

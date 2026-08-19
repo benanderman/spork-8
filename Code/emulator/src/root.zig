@@ -6,14 +6,7 @@ const builtin = @import("builtin");
 const os = std.os;
 const assert = std.debug.assert;
 
-const c = @cImport({
-    @cDefine("SDL_DISABLE_OLD_NAMES", {});
-    @cInclude("SDL3/SDL.h");
-    @cInclude("SDL3/SDL_revision.h");
-    @cDefine("SDL_MAIN_HANDLED", {}); // We are providing our own entry point
-    @cInclude("SDL3/SDL_main.h");
-    @cInclude("spork_8_state.h");
-});
+const c = @import("c");
 
 // Constants for peripherals.
 const screen_RCLCK: u8 = 0b00000100;
@@ -35,7 +28,7 @@ var window: *c.SDL_Window = undefined;
 var renderer: *c.SDL_Renderer = undefined;
 
 // var progmem = [_]u8{0} ** 65536;
-var ram = [_]u8{0} ** 65536;
+var ram: [65536]u8 = @splat(0);
 var state: c.struct_Spork8State = .{
     .inst_reg = 0,
     .flags_reg = 0,
@@ -45,6 +38,8 @@ var state: c.struct_Spork8State = .{
     .get_progmem_byte = get_progmem_byte,
     .get_ram_byte = get_ram_byte,
     .set_ram_byte = set_ram_byte,
+
+    .module_values = @splat(0),
 };
 
 var screen_buffer: u200 = 2;
@@ -80,7 +75,7 @@ const static_cartridge = [_]u8{
     0x58, 0x5c, 0x9e, 0x01, 0x55, 0x69, 0x81, 0x66, 0x15, 0x04, 0x15, 0x00, 0x66, 0x80, 0x72,
 };
 
-var cartridge = [_]u8{0} ** 65536;
+var cartridge: [65536]u8 = @splat(0);
 
 // Jump to cartridge
 const progmem_eeprom = [_]u8{ 0x66, 0x80, 0x00 };
@@ -340,7 +335,7 @@ const ErrorStore = struct {
     const status_storing = 1;
     const status_stored = 2;
 
-    status: c.SDL_AtomicInt = .{},
+    status: c.SDL_AtomicInt = .{ .value = 0 },
     err: anyerror = undefined,
     trace_index: usize = undefined,
     trace_addrs: [32]usize = undefined,
