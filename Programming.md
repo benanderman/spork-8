@@ -15,11 +15,14 @@ In each stack frame, the return address is stored in the first 2 bytes (0 is the
 ## Types
 
 The only integer size natively supported by arithmetic and logic instructions is 8 bits, but pointers are 16 bits, and C types are defined as:
+ * `char`: signed.
  * `int`: 16-bit.
  * `short`: 16-bit.
  * `long`: 32-bit.
  * `long long`: 64-bit.
- * `char`: signed.
+ * `float`: 32-bit floating point (23-bit mantissa) IEEE-754-2008 binary32.
+ * `double`: 64-bit floating point (52-bit mantissa) IEEE-754-2008 binary64.
+ * `long double`: same as `double`.
 
 ## Compiling Assembly Files
 
