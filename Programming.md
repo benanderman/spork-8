@@ -24,6 +24,8 @@ The only integer size natively supported by arithmetic and logic instructions is
  * `double`: 64-bit floating point (52-bit mantissa) IEEE-754-2008 binary64.
  * `long double`: same as `double`.
 
+All types are aligned to 1 byte.
+
 ## Compiling Assembly Files
 
 Dependency: [customasm](https://hlorenzi.github.io/customasm/)
