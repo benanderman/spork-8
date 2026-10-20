@@ -6,14 +6,7 @@ const builtin = @import("builtin");
 const os = std.os;
 const assert = std.debug.assert;
 
-const c = @cImport({
-    @cDefine("SDL_DISABLE_OLD_NAMES", {});
-    @cInclude("SDL3/SDL.h");
-    @cInclude("SDL3/SDL_revision.h");
-    @cDefine("SDL_MAIN_HANDLED", {}); // We are providing our own entry point
-    @cInclude("SDL3/SDL_main.h");
-    @cInclude("spork_8_state.h");
-});
+const c = @import("c");
 
 // Constants for peripherals.
 const screen_RCLCK: u8 = 0b00000100;
@@ -35,7 +28,7 @@ var window: *c.SDL_Window = undefined;
 var renderer: *c.SDL_Renderer = undefined;
 
 // var progmem = [_]u8{0} ** 65536;
-var ram = [_]u8{0} ** 65536;
+var ram: [65536]u8 = @splat(0);
 var state: c.struct_Spork8State = .{
     .inst_reg = 0,
     .flags_reg = 0,
@@ -45,6 +38,8 @@ var state: c.struct_Spork8State = .{
     .get_progmem_byte = get_progmem_byte,
     .get_ram_byte = get_ram_byte,
     .set_ram_byte = set_ram_byte,
+
+    .module_values = @splat(0),
 };
 
 var screen_buffer: u200 = 2;
@@ -80,7 +75,7 @@ const static_cartridge = [_]u8{
     0x58, 0x5c, 0x9e, 0x01, 0x55, 0x69, 0x81, 0x66, 0x15, 0x04, 0x15, 0x00, 0x66, 0x80, 0x72,
 };
 
-var cartridge = [_]u8{0} ** 65536;
+var cartridge: [65536]u8 = @splat(0);
 
 // Jump to cartridge
 const progmem_eeprom = [_]u8{ 0x66, 0x80, 0x00 };
@@ -158,74 +153,77 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.SDL_AppResult {
 fn sdlAppIterate(appstate: ?*anyopaque) !c.SDL_AppResult {
     _ = appstate;
 
-    const old_outa_value = state.module_values[c.OUTA];
-    const old_ioa_value = c.spork8_state_get_output_value(&state, c.IOA);
-
-    c.spork8_state_cycle(&state);
-
-    // Update screen.
-    const new_outa_state = state.module_values[c.OUTA];
-    if ((old_outa_value & screen_SRCLCK) == 0 and (new_outa_state & screen_SRCLCK) != 0) {
-        screen_buffer_internal <<= 1;
-        if ((new_outa_state & screen_SER) != 0)
-            screen_buffer_internal |= 1;
-    }
     var need_redraw = false;
-    if ((old_outa_value & screen_RCLCK) == 0 and (new_outa_state & screen_RCLCK) != 0) {
-        screen_buffer = screen_buffer_internal;
-        need_redraw = true;
-        // print("Need redraw: {}\n", .{need_redraw});
-    }
+    for (0..1000) |_| {
+        const old_outa_value = state.module_values[c.OUTA];
+        const old_ioa_value = c.spork8_state_get_output_value(&state, c.IOA);
 
-    // Update controller.
-    const new_ioa_value = c.spork8_state_get_output_value(&state, c.IOA);
-    if ((old_ioa_value & controller_CLK) == 0 and (new_ioa_value & controller_CLK) != 0) {
-        if (new_ioa_value & controller_SHLD != 0) {
-            // print("Shifting controller\n", .{});
-            controller_buffer1 >>= 1;
-            controller_buffer2 >>= 1;
-        } else {
-            var count: c_int = 0;
-            const keyboard_state = c.SDL_GetKeyboardState(&count);
-            const scancodes1 = [8]c_int{
-                c.SDL_SCANCODE_LEFT,
-                c.SDL_SCANCODE_UP,
-                c.SDL_SCANCODE_RIGHT,
-                c.SDL_SCANCODE_DOWN,
-                c.SDL_SCANCODE_ESCAPE,
-                c.SDL_SCANCODE_RETURN,
-                c.SDL_SCANCODE_N,
-                c.SDL_SCANCODE_M,
-            };
-            controller_buffer1 = 0;
-            for (scancodes1, 0..) |value, index| {
-                const u3_index: u3 = @intCast(index);
-                const u8_value: u8 = if (keyboard_state[@intCast(value)]) 1 else 0;
-                controller_buffer1 |= (u8_value << u3_index);
-            }
+        c.spork8_state_cycle(&state);
 
-            const scancodes2 = [8]c_int{
-                c.SDL_SCANCODE_A,
-                c.SDL_SCANCODE_W,
-                c.SDL_SCANCODE_D,
-                c.SDL_SCANCODE_S,
-                c.SDL_SCANCODE_TAB,
-                c.SDL_SCANCODE_R,
-                c.SDL_SCANCODE_F,
-                c.SDL_SCANCODE_G,
-            };
-            controller_buffer2 = 0;
-            for (scancodes2, 0..) |value, index| {
-                const u3_index: u3 = @intCast(index);
-                const u8_value: u8 = if (keyboard_state[@intCast(value)]) 1 else 0;
-                controller_buffer2 |= (u8_value << u3_index);
-            }
-            // print("Set controller state: {}\n", .{controller_buffer});
+        // Update screen.
+        const new_outa_state = state.module_values[c.OUTA];
+        if ((old_outa_value & screen_SRCLCK) == 0 and (new_outa_state & screen_SRCLCK) != 0) {
+            screen_buffer_internal <<= 1;
+            if ((new_outa_state & screen_SER) != 0)
+                screen_buffer_internal |= 1;
+        }
+        if ((old_outa_value & screen_RCLCK) == 0 and (new_outa_state & screen_RCLCK) != 0) {
+            screen_buffer = screen_buffer_internal;
+            need_redraw = true;
+            break;
+            // print("Need redraw: {}\n", .{need_redraw});
         }
 
-        var ser_value = if (controller_buffer1 & 1 != 0) controller_SER1 else 0;
-        ser_value |= if (controller_buffer2 & 1 != 0) controller_SER2 else 0;
-        c.spork8_state_set_input_value(&state, c.IOA, controller_CONN1 | ser_value);
+        // Update controller.
+        const new_ioa_value = c.spork8_state_get_output_value(&state, c.IOA);
+        if ((old_ioa_value & controller_CLK) == 0 and (new_ioa_value & controller_CLK) != 0) {
+            if (new_ioa_value & controller_SHLD != 0) {
+                // print("Shifting controller\n", .{});
+                controller_buffer1 >>= 1;
+                controller_buffer2 >>= 1;
+            } else {
+                var count: c_int = 0;
+                const keyboard_state = c.SDL_GetKeyboardState(&count);
+                const scancodes1 = [8]c_int{
+                    c.SDL_SCANCODE_LEFT,
+                    c.SDL_SCANCODE_UP,
+                    c.SDL_SCANCODE_RIGHT,
+                    c.SDL_SCANCODE_DOWN,
+                    c.SDL_SCANCODE_ESCAPE,
+                    c.SDL_SCANCODE_RETURN,
+                    c.SDL_SCANCODE_N,
+                    c.SDL_SCANCODE_M,
+                };
+                controller_buffer1 = 0;
+                for (scancodes1, 0..) |value, index| {
+                    const u3_index: u3 = @intCast(index);
+                    const u8_value: u8 = if (keyboard_state[@intCast(value)]) 1 else 0;
+                    controller_buffer1 |= (u8_value << u3_index);
+                }
+
+                const scancodes2 = [8]c_int{
+                    c.SDL_SCANCODE_A,
+                    c.SDL_SCANCODE_W,
+                    c.SDL_SCANCODE_D,
+                    c.SDL_SCANCODE_S,
+                    c.SDL_SCANCODE_TAB,
+                    c.SDL_SCANCODE_R,
+                    c.SDL_SCANCODE_F,
+                    c.SDL_SCANCODE_G,
+                };
+                controller_buffer2 = 0;
+                for (scancodes2, 0..) |value, index| {
+                    const u3_index: u3 = @intCast(index);
+                    const u8_value: u8 = if (keyboard_state[@intCast(value)]) 1 else 0;
+                    controller_buffer2 |= (u8_value << u3_index);
+                }
+                // print("Set controller state: {}\n", .{controller_buffer});
+            }
+
+            var ser_value = if (controller_buffer1 & 1 != 0) controller_SER1 else 0;
+            ser_value |= if (controller_buffer2 & 1 != 0) controller_SER2 else 0;
+            c.spork8_state_set_input_value(&state, c.IOA, controller_CONN1 | ser_value);
+        }
     }
 
     // Draw.
@@ -340,7 +338,7 @@ const ErrorStore = struct {
     const status_storing = 1;
     const status_stored = 2;
 
-    status: c.SDL_AtomicInt = .{},
+    status: c.SDL_AtomicInt = .{ .value = 0 },
     err: anyerror = undefined,
     trace_index: usize = undefined,
     trace_addrs: [32]usize = undefined,

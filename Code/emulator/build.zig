@@ -1,4 +1,5 @@
 const std = @import("std");
+const translate_c = @import("translate_c");
 
 pub fn build(b: *std.Build) void {
     // Standard target options allow the person running `zig build` to choose
@@ -10,6 +11,23 @@ pub fn build(b: *std.Build) void {
     // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall. Here we do not
     // set a preferred release mode, allowing the user to decide how to optimize.
     const optimize = b.standardOptimizeOption(.{});
+
+    const sdl_dep = b.dependency("sdl", .{
+        .target = target,
+        .optimize = optimize,
+        // .lto = lto,
+    });
+
+    const translate_c_dep = b.dependency("translate_c", .{});
+    const translator: translate_c.Translator = .init(translate_c_dep, .{
+        .c_source_file = b.path("src/c.h"),
+        .target = target,
+        .optimize = optimize,
+    });
+    const sdl_lib = sdl_dep.artifact("SDL3");
+    translator.linkLibrary(sdl_lib);
+    translator.addIncludePath(b.path(".."));
+
     // It's also possible to define more custom flags to toggle optional features
     // of this build script using `b.option()`. All defined flags (including
     // target and optimize options) will be listed when running `zig build --help`
@@ -39,15 +57,7 @@ pub fn build(b: *std.Build) void {
     mod.addCSourceFile(.{ .file = b.path("../spork_8_state.cpp") });
     mod.addCSourceFile(.{ .file = b.path("../instructions.cpp") });
     mod.addCSourceFile(.{ .file = b.path("../instruction_set.cpp") });
-    mod.addIncludePath(b.path(".."));
-
-    const sdl_dep = b.dependency("sdl", .{
-        .target = target,
-        .optimize = optimize,
-        // .lto = lto,
-    });
-    const sdl_lib = sdl_dep.artifact("SDL3");
-    mod.linkLibrary(sdl_lib);
+    mod.addImport("c", translator.mod);
 
     // Here we define an executable. An executable needs to have a root module
     // which needs to expose a `main` function. While we could add a main function
@@ -119,9 +129,7 @@ pub fn build(b: *std.Build) void {
 
     // This allows the user to pass arguments to the application in the build
     // command itself, like this: `zig build run -- arg1 arg2 etc`
-    if (b.args) |args| {
-        run_cmd.addArgs(args);
-    }
+    run_cmd.addPassthruArgs();
 
     // Creates an executable that will run `test` blocks from the provided module.
     // Here `mod` needs to define a target, which is why earlier we made sure to

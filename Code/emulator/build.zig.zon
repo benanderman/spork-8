@@ -25,7 +25,7 @@
     .fingerprint = 0x9c696d3ff2217b1f, // Changing this has security and trust implications.
     // Tracks the earliest Zig version that the package considers to be a
     // supported use case.
-    .minimum_zig_version = "0.15.2",
+    .minimum_zig_version = "0.17.0-dev.1821+fff5e675b",
     // This field is optional.
     // Each dependency must either provide a `url` and `hash`, or a `path`.
     // `zig build --fetch` can be used to fetch all dependencies of a package, recursively.
@@ -33,8 +33,12 @@
     // internet connectivity.
     .dependencies = .{
         .sdl = .{
-            .url = "git+https://github.com/castholm/SDL.git#f103a1439670c35be756d4491b296a6e3ccffaed",
-            .hash = "sdl-0.3.2+3.2.26-7uIn9BNgfwHaS0qXiSIBLkJf8Jfrh5P6gSWdQvtnvxEp",
+            .url = "git+https://github.com/castholm/SDL.git#b72b3671502a70e109350ecac90afdc480dcfcc6",
+            .hash = "sdl-0.5.4+3.4.16-SDL--sQ4qAH3kwC19Zs1kxdHplaSDnWl2MUptZD4AItI",
+        },
+        .translate_c = .{
+            .url = "git+https://codeberg.org/ziglang/translate-c#875969d3493e245e01bf5d7860f792d8f3eb9ef5",
+            .hash = "translate_c-0.0.0-Q_BUWoFOBwAhz77Zd15HCVuhTKzdUKc94kezmCeJ7IC_",
         },
     },
     .paths = .{
